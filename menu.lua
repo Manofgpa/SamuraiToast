@@ -1,5 +1,5 @@
 
-
+--configura o menu do jogo
 
 button = {}
 
