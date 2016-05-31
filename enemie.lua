@@ -1,5 +1,5 @@
 
 
 function love.draw()
-love.graphics.draw(love.graphics.newImage("images/gomba.png"), 200, 200) 
+love.graphics.draw(love.graphics.newImage("enemies/gomba.png"), 200, 200) 
 end 
