@@ -17,9 +17,11 @@ function button_draw()
 			love.graphics.setColor(love.math.random(255),love.math.random(255),love.math.random(255))
 		end
 		if v.mouseover == true and v.id == "sair" then
+			love.audio.play(source)
 			love.graphics.print("NAO SAI",love.math.random(800),love.math.random(600))
 			love.graphics.print("NAO SAI",love.math.random(800),love.math.random(600))
-			
+		else
+				love.audio.pause(source)
 			end
 			love.graphics.setFont(fonte)
 			love.graphics.print(v.text,v.x,v.y)

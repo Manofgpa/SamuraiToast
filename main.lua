@@ -85,6 +85,8 @@ end
 -------------------------------------------------------------------------
 function love.load()
 	
+	source = love.audio.newSource("nyan.mp3","stream")
+	
 	samuraimenu = love.graphics.newImage ("samuraimenu.png")
 	fonte = love.graphics.newFont("fonteninja.ttf",40)
 	-- love.window.setFullscreen(true) -- FULLSCREEN
