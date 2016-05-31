@@ -86,7 +86,7 @@ end
 function love.load()
 
 
-	
+
 	samuraimenu = love.graphics.newImage ("samuraimenu.png")
 	fonte = love.graphics.newFont("fonteninja.ttf",40)
 	-- love.window.setFullscreen(true) -- FULLSCREEN
@@ -120,6 +120,13 @@ function love.mousepressed(x,y)
 end
 -------------------------------------------------------------------------
 function love.update(dt)
+
+	mousex = love.mouse.getX()
+	mousey = love.mouse.getY()
+
+	if gamestate == "menu" then
+		button_check()
+	end
 
 	if gamestate == "jogando" then
 
@@ -260,9 +267,10 @@ function love.draw()
 
 	if gamestate == "menu" then
 		
-		love.graphics.draw(menu,0,0,ox,0.75)
-		love.graphics.draw(samuraimenu,140,100)
-		button_draw()
+	love.graphics.draw(menu,0,0,ox,0.75)
+	love.graphics.draw(samuraimenu,140,100)
+	button_draw()
+
 	end
 end 
 
