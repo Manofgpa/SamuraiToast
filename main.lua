@@ -84,14 +84,13 @@ function enemyCall() --faz inimigos surgir na tela de tipos aleatorios e margens
 end 
 -------------------------------------------------------------------------
 function love.load()
-
-
-
+	
 	samuraimenu = love.graphics.newImage ("samuraimenu.png")
 	fonte = love.graphics.newFont("fonteninja.ttf",40)
 	-- love.window.setFullscreen(true) -- FULLSCREEN
 	gamestate = "menu"
-	menu = love.graphics.newImage("backgroundi.jpg")
+	menu = love.graphics.newImage("backgroundi.png")
+
 
 	LoadMap("mapa.txt") -- chama funcao Load Map que carrega mapa do jogo vindo do arquivo txt
 	LoadTiles("images/mapa/sheet.png",13,8)
@@ -110,7 +109,7 @@ function love.load()
 --butoes jogo
 
 	button_spawn(390,300,"Start","start")
-	button_spawn(10,550,"Sair","sair")
+	button_spawn(10,550,"Quit","sair")
 
 end
 function love.mousepressed(x,y)
@@ -121,6 +120,7 @@ end
 -------------------------------------------------------------------------
 function love.update(dt)
 
+	
 	mousex = love.mouse.getX()
 	mousey = love.mouse.getY()
 
@@ -266,8 +266,7 @@ function love.draw()
 	end
 
 	if gamestate == "menu" then
-		
-	love.graphics.draw(menu,0,0,ox,0.75)
+	love.graphics.draw(menu,0,0,ox,1.35)
 	love.graphics.draw(samuraimenu,140,100)
 	button_draw()
 
