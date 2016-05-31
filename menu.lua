@@ -21,34 +21,37 @@ function button_draw()
 			love.graphics.print("NAO SAI",love.math.random(800),love.math.random(600))
 			love.graphics.print("NAO SAI",love.math.random(800),love.math.random(600))
 		else
-				love.audio.pause(source)
-			end
-			love.graphics.setFont(fonte)
-			love.graphics.print(v.text,v.x,v.y)
-
-
+			love.audio.pause(source)
 		end
-	end
+		if v.mouseover == true and v.id == "start" then
+			love.audio.play(horadoshow)
+end
+		love.graphics.setFont(fonte)
+		love.graphics.print(v.text,v.x,v.y)
 
-	function button_click(x,y)
-		for i,v in ipairs(button) do
-			if x > v.x and x < v.x + fonte:getWidth(v.text) and y > v.y and y < v.y + fonte:getHeight() then
-				if v.id == "sair" then
-					love.event.quit()
-				end
-				if v.id == "start" then
-					gamestate = "jogando"
-				end
+
+	end
+end
+
+function button_click(x,y)
+	for i,v in ipairs(button) do
+		if x > v.x and x < v.x + fonte:getWidth(v.text) and y > v.y and y < v.y + fonte:getHeight() then
+			if v.id == "sair" then
+				love.event.quit()
 			end
-		end
-	end
-
-	function button_check()
-		for i,v in ipairs(button) do
-			if mousex > v.x and mousex < v.x + fonte:getWidth(v.text) and mousey > v.y and mousey < v.y+ fonte:getHeight() then
-				v.mouseover = true
-			else
-				v.mouseover = false
+			if v.id == "start" then
+				gamestate = "jogando"
 			end
 		end
 	end
+end
+
+function button_check()
+	for i,v in ipairs(button) do
+		if mousex > v.x and mousex < v.x + fonte:getWidth(v.text) and mousey > v.y and mousey < v.y+ fonte:getHeight() then
+			v.mouseover = true
+		else
+			v.mouseover = false
+		end
+	end
+end

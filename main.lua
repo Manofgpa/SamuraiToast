@@ -84,24 +84,32 @@ function enemyCall() --faz inimigos surgir na tela de tipos aleatorios e margens
 end 
 -------------------------------------------------------------------------
 function love.load()
-	
-	source = love.audio.newSource("nyan.mp3","stream")
-	
-	samuraimenu = love.graphics.newImage ("samuraimenu.png")
-	fonte = love.graphics.newFont("fonteninja.ttf",40)
-	-- love.window.setFullscreen(true) -- FULLSCREEN
+
+	horadoshow = love.audio.newSource("sons/horadoshow.mp3","stream")
+	--[[tasaino = love.audio.newSource("tasaino.mp3","stream")
+	--grito = love.audio.newSource("grito.mp3","stream")
+	--comimuito = love.audio.newSource("comimuito.mp3","stream")
+	--boribilder = love.audio.newSource("boribilder.mp3","stream")
+	--biur = love.audio.newSource("biur.mp3","stream")
+	-- ajuda = love.audio.newSource("ajuda.mp3","stream")]]
+	source = love.audio.newSource("sons/nyan.mp3","stream")
+
+
+	samuraimenu = love.graphics.newImage ("menu/samuraimenu.png")
+	fonte = love.graphics.newFont("fontes/fonteninja.ttf",40)
+-- love.window.setFullscreen(true) -- FULLSCREEN
 	gamestate = "menu"
-	menu = love.graphics.newImage("backgroundi.png")
+	menu = love.graphics.newImage("menu/backgroundi.png")
 
 
-	LoadMap("mapa.txt") -- chama funcao Load Map que carrega mapa do jogo vindo do arquivo txt
-	LoadTiles("images/mapa/sheet.png",13,8)
+	LoadMap("mapa/mapa.txt") -- chama funcao Load Map que carrega mapa do jogo vindo do arquivo txt
+	LoadTiles("mapa/sheet.png",13,8)
 
 
 
 	for x = 1, 9, 1 do -- carrega instancia "walk" da tabela "hero" com imagens da caminhada do heroi
 
-		hero.walk[x] = love.graphics.newImage("images/Hero_Walk_0" .. x .. ".png")
+		hero.walk[x] = love.graphics.newImage("hero/Hero_Walk_0" .. x .. ".png")
 	end
 
 	timer= 0 
@@ -122,7 +130,7 @@ end
 -------------------------------------------------------------------------
 function love.update(dt)
 
-	
+
 	mousex = love.mouse.getX()
 	mousey = love.mouse.getY()
 
@@ -233,7 +241,7 @@ function love.draw()
 				if (mapa[i][j] == "G") then 
 					love.graphics.draw(tilesetImage, tileQuads[60], (j * tileSize) - tileSize, (i * tileSize) - tileSize)
 				elseif (mapa[i][j] == "D") then
-					love.graphics.draw(love.graphics.newImage("images/tree.png"),(j * tileSize) - tileSize, (i * tileSize) - tileSize)
+					love.graphics.draw(love.graphics.newImage("hero/tree.png"),(j * tileSize) - tileSize, (i * tileSize) - tileSize)
 				elseif (mapa[i][j] == "C") then
 					love.graphics.draw(tilesetImage, tileQuads[7], (j * tileSize) - tileSize, (i * tileSize) - tileSize)
 				elseif (mapa[i][j] == "P") then
@@ -257,8 +265,8 @@ function love.draw()
 
 		for i,v in ipairs(enemy) do
 			if v.tipo == "gomba" then 
-				v.img[1] = love.graphics.newImage("images/enemies/gomba1.png") 
-				v.img[2] = love.graphics.newImage("images/enemies/gomba2.png")
+				v.img[1] = love.graphics.newImage("enemies/gomba1.png") 
+				v.img[2] = love.graphics.newImage("enemies/gomba2.png")
 			end 
 
 			love.graphics.draw( v.img[v.frame] , v.pos_x, v.pos_y)
@@ -268,9 +276,9 @@ function love.draw()
 	end
 
 	if gamestate == "menu" then
-	love.graphics.draw(menu,0,0,ox,1.35)
-	love.graphics.draw(samuraimenu,140,100)
-	button_draw()
+		love.graphics.draw(menu,0,0,ox,1.35)
+		love.graphics.draw(samuraimenu,140,100)
+		button_draw()
 
 	end
 end 
