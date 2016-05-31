@@ -86,7 +86,9 @@ end
 function love.load()
 
 
-	fonte = love.graphics.newFont(55)
+	
+	samuraimenu = love.graphics.newImage ("samuraimenu.png")
+	fonte = love.graphics.newFont("fonteninja.ttf",40)
 	-- love.window.setFullscreen(true) -- FULLSCREEN
 	gamestate = "menu"
 	menu = love.graphics.newImage("backgroundi.jpg")
@@ -107,7 +109,7 @@ function love.load()
 
 --butoes jogo
 
-	button_spawn(400,300,"Start","start")
+	button_spawn(390,300,"Start","start")
 	button_spawn(10,550,"Sair","sair")
 
 end
@@ -257,6 +259,9 @@ function love.draw()
 	end
 
 	if gamestate == "menu" then
+		
+		love.graphics.draw(menu,0,0,ox,0.75)
+		love.graphics.draw(samuraimenu,140,100)
 		button_draw()
 	end
 end 
