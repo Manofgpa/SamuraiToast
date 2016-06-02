@@ -1,6 +1,5 @@
 require "menu"
-
-
+require "gamera"
 
 
 love.keyboard.keysPressed = { }
@@ -74,9 +73,9 @@ hero= {
 
 	walk = {} , 
 
-	pos_x=100  , 
+	pos_x=400  , 
 
-	pos_y= 225  , 
+	pos_y= 300  , 
 
 	velocidade = 120  ,
 
@@ -282,9 +281,8 @@ end
 -------------------------------------------------------------------------
 
 function love.load()
-
-
-
+  
+ -- local cam = gamera.new(0,0,2000,2000)
 
 	horadoshow = love.audio.newSource("sons/horadoshow.mp3","stream")
 
@@ -300,7 +298,7 @@ function love.load()
 
 	-- ajuda = love.audio.newSource("ajuda.mp3","stream")]]
 
-	source = love.audio.newSource("sons/nyan.mp3","stream")
+	nyan = love.audio.newSource("sons/nyan.mp3","stream")
 
 
 
@@ -314,7 +312,7 @@ function love.load()
 
 -- love.window.setFullscreen(true) -- FULLSCREEN
 
-	gamestate = "jogando"
+	gamestate = "menu"
 
 	menu = love.graphics.newImage("menu/backgroundi.png")
 
@@ -364,12 +362,18 @@ function love.load()
 
 
 
-
+  if gamestate == "menu" then
 	button_spawn(390,300,"Start","start")
 
 	button_spawn(10,550,"Quit","sair")
-  
-  button_spawn(400,22,"Pause","pause")
+end
+
+
+  if gamestate == "jogando" then
+      button_spawn(400,22,"Pause","pause")
+    end
+    
+
   
 
   timer= 0 
@@ -400,8 +404,6 @@ end
 -------------------------------------------------------------------------
 
 function love.update(dt)
-
-
 
 
 
@@ -747,8 +749,6 @@ end
 function love.draw()
 
 
-
-
 	if gamestate == "jogando" then
 
 
@@ -886,8 +886,6 @@ local dir_x= 1
  love.graphics.setFont(fonte,50)
  --love.graphics.print("PAUSE",400,22)
 end 
-
-
 
 
 love.graphics.setColor(255, 255, 255) 
