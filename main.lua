@@ -1,289 +1,13 @@
 require "menu"
-require "gamera"
 
+local gamera = require "gamera"
 
-love.keyboard.keysPressed = { }
+local cam = gamera.new(0,0,2000,2000)
 
-love.keyboard.keysReleased = { }
-
--- returns if specified key was pressed since the last update
-
-function love.keyboard.wasPressed(key)
-
-	if (love.keyboard.keysPressed[key]) then
-
-		return true
-
-	else
-
-		return false
-
-	end
-
-end
-
--- returns if specified key was released since last update
-
-function love.keyboard.wasReleased(key)
-
-	if (love.keyboard.keysReleased[key]) then
-
-		return true
-
-	else
-
-		return false
-
-	end
-
-end
-
--- concatenate this to existing love.keypressed callback, if any
-
-function love.keypressed(key, unicode)
-
-	love.keyboard.keysPressed[key] = true
-
-end
-
--- concatenate this to existing love.keyreleased callback, if any
-
-function love.keyreleased(key)
-
-	love.keyboard.keysReleased[key] = true
-
-end
-
--- call in end of each love.update to reset lists of pressed\released keys
-
-function love.keyboard.updateKeys()
-
-	love.keyboard.keysPressed = { }
-
-	love.keyboard.keysReleased = { }
-
-end
-
-
-
-
-hero= { 
-
-	anim_frame= 1 , 
-
-	walk = {} , 
-
-	pos_x=400  , 
-
-	pos_y= 300  , 
-
-	velocidade = 120  ,
-
-	anim_time=0, 
-
-  life = 250
-
-}
-
-
-
-
-local tilesetImage
-
-local tileQuads = {}
-
-local tileSize = 16
-
-
-
-
-function LoadTiles(filename, nx, ny)
-
-	tilesetImage = love.graphics.newImage(filename)
-
-	local count = 1
-
-	for i = 0, nx, 1 do
-
-		for j = 0, ny, 1 do
-
-			tileQuads[count] = love.graphics.newQuad(i * tileSize ,j * tileSize, tileSize, tileSize,tilesetImage:getWidth(), tilesetImage:getHeight())
-
-
-
-
-			count = count + 1
-
-		end
-
-	end
-
-end
-
-
-
-
-local mapa={} 
-
-function LoadMap(filename)
-
-
-
-
-
-
-
-	local file = io.open(filename)
-
-	local i = 1
-
-	for line in file:lines() do
-
-		mapa[i] = {}
-
-		for j=1, #line, 1 do
-
-			mapa[i][j] = line:sub(j,j)
-
-		end
-
-		i = i + 1
-
-	end
-
-	file:close()
-
-end
-
-
-
-
-enemy= {} --tabela com todos os inimigos do jogo
-
-
-
-
-function enemy.spawn(tipo, x, y)
-
-	table.insert(enemy, {pos_x=x, pos_y=y, tipo=tipo, anim_time=0, img={}, frame=1})
-
-end
-
-
-
-
-function enemyCall() --faz inimigos surgir na tela de tipos aleatorios e margens aleatorias
-
-	tipo =  1 --[[enquanto n temos imagens para os inimigos vou deixar com so um tipo para poder rodar os testes--love.math.random(1,3)  -- cada numero equivale a um tipo, define aleatoriamente os tipos de inimigo --]]
-
-	if (tipo == 1) then 
-
-		tipo= "gomba" 
-
-	else if (tipo == 2) then
-
-		tipo = "kopa" 
-
-	else 
-
-		tipo= "turtle" 
-
-	end end 
-
-
-
-
-	sp = love.math.random(0,1)  -- difinem de qual margem da tela inimigos irao surgir 
-
-	sp2 = love.math.random(0,1) 
-
-	if (sp == 1) then 
-
-		if (sp2 == 1 ) then 
-
-			enemy.spawn(tipo, love.math.random(0,800), 0 )  
-
-		else 
-
-			enemy.spawn(tipo, love.math.random(0,800), 600 )  
-
-		end 
-
-	else 
-
-		if (sp2 == 1 ) then 
-
-			enemy.spawn(tipo, 0,  love.math.random(0,600) )  
-
-		else 
-
-			enemy.spawn(tipo, 800, love.math.random(0,600))  
-
-		end 
-
-	end 
-
-  
-
-  for i, v in ipairs(enemy) do 
-
-      if v.tipo == "gomba" then 
-
-        v.img[1] = love.graphics.newImage("enemies/gomba1.png") 
-
-        v.img[2] = love.graphics.newImage("enemies/gomba2.png")
-
-      
-
-      elseif v.tipo == "kopa" then  
-
-        v.img[1] = love.graphics.newImage("enemies/kopa1.png") 
-
-        v.img[2] = love.graphics.newImage("enemies/kopa2.png")
-
-      
-
-      end 
-
-    end 
-
-
-
-
-end 
-
-
-
-
-shots = {}  -- table with all shurikens 
-
-function shoot(x, y , dirx, diry) -- makes shuriken appear on the screen from pont where hero faces
-
-  table.insert ( shots, {img = love.graphics.newImage("hero/shot.png"), pos_x = x, pos_y = y , 
-
-      dir_x = dirx,   dir_y=diry,collision = false}) 
-
-  end 
-
-  
-
-  
-
-function checkCol( x1, y1, w1,h1, x2,y2,w2,h2) 
-
-   return x1 < x2+w2 and x2 < x1+w1 and y1 < y2+h2 and y2 < y1+h1
-
-end 
-
-
-
-
--------------------------------------------------------------------------
 
 function love.load()
   
- -- local cam = gamera.new(0,0,2000,2000)
-
+ 
 	horadoshow = love.audio.newSource("sons/horadoshow.mp3","stream")
 
 	--[[tasaino = love.audio.newSource("tasaino.mp3","stream")
@@ -740,6 +464,286 @@ end
 
 
  
+
+
+
+love.keyboard.keysPressed = { }
+
+love.keyboard.keysReleased = { }
+
+-- returns if specified key was pressed since the last update
+
+function love.keyboard.wasPressed(key)
+
+	if (love.keyboard.keysPressed[key]) then
+
+		return true
+
+	else
+
+		return false
+
+	end
+
+end
+
+-- returns if specified key was released since last update
+
+function love.keyboard.wasReleased(key)
+
+	if (love.keyboard.keysReleased[key]) then
+
+		return true
+
+	else
+
+		return false
+
+	end
+
+end
+
+-- concatenate this to existing love.keypressed callback, if any
+
+function love.keypressed(key, unicode)
+
+	love.keyboard.keysPressed[key] = true
+
+end
+
+-- concatenate this to existing love.keyreleased callback, if any
+
+function love.keyreleased(key)
+
+	love.keyboard.keysReleased[key] = true
+
+end
+
+-- call in end of each love.update to reset lists of pressed\released keys
+
+function love.keyboard.updateKeys()
+
+	love.keyboard.keysPressed = { }
+
+	love.keyboard.keysReleased = { }
+
+end
+
+
+
+
+hero= { 
+
+	anim_frame= 1 , 
+
+	walk = {} , 
+
+	pos_x=400  , 
+
+	pos_y= 300  , 
+
+	velocidade = 120  ,
+
+	anim_time=0, 
+
+  life = 250
+
+}
+
+
+
+
+local tilesetImage
+
+local tileQuads = {}
+
+local tileSize = 16
+
+
+
+
+function LoadTiles(filename, nx, ny)
+
+	tilesetImage = love.graphics.newImage(filename)
+
+	local count = 1
+
+	for i = 0, nx, 1 do
+
+		for j = 0, ny, 1 do
+
+			tileQuads[count] = love.graphics.newQuad(i * tileSize ,j * tileSize, tileSize, tileSize,tilesetImage:getWidth(), tilesetImage:getHeight())
+
+
+
+
+			count = count + 1
+
+		end
+
+	end
+
+end
+
+
+
+
+local mapa={} 
+
+function LoadMap(filename)
+
+
+
+
+
+
+
+	local file = io.open(filename)
+
+	local i = 1
+
+	for line in file:lines() do
+
+		mapa[i] = {}
+
+		for j=1, #line, 1 do
+
+			mapa[i][j] = line:sub(j,j)
+
+		end
+
+		i = i + 1
+
+	end
+
+	file:close()
+
+end
+
+
+
+
+enemy= {} --tabela com todos os inimigos do jogo
+
+
+
+
+function enemy.spawn(tipo, x, y)
+
+	table.insert(enemy, {pos_x=x, pos_y=y, tipo=tipo, anim_time=0, img={}, frame=1})
+
+end
+
+
+
+
+function enemyCall() --faz inimigos surgir na tela de tipos aleatorios e margens aleatorias
+
+	tipo =  1 --[[enquanto n temos imagens para os inimigos vou deixar com so um tipo para poder rodar os testes--love.math.random(1,3)  -- cada numero equivale a um tipo, define aleatoriamente os tipos de inimigo --]]
+
+	if (tipo == 1) then 
+
+		tipo= "gomba" 
+
+	else if (tipo == 2) then
+
+		tipo = "kopa" 
+
+	else 
+
+		tipo= "turtle" 
+
+	end end 
+
+
+
+
+	sp = love.math.random(0,1)  -- difinem de qual margem da tela inimigos irao surgir 
+
+	sp2 = love.math.random(0,1) 
+
+	if (sp == 1) then 
+
+		if (sp2 == 1 ) then 
+
+			enemy.spawn(tipo, love.math.random(0,800), 0 )  
+
+		else 
+
+			enemy.spawn(tipo, love.math.random(0,800), 600 )  
+
+		end 
+
+	else 
+
+		if (sp2 == 1 ) then 
+
+			enemy.spawn(tipo, 0,  love.math.random(0,600) )  
+
+		else 
+
+			enemy.spawn(tipo, 800, love.math.random(0,600))  
+
+		end 
+
+	end 
+
+  
+
+  for i, v in ipairs(enemy) do 
+
+      if v.tipo == "gomba" then 
+
+        v.img[1] = love.graphics.newImage("enemies/gomba1.png") 
+
+        v.img[2] = love.graphics.newImage("enemies/gomba2.png")
+
+      
+
+      elseif v.tipo == "kopa" then  
+
+        v.img[1] = love.graphics.newImage("enemies/kopa1.png") 
+
+        v.img[2] = love.graphics.newImage("enemies/kopa2.png")
+
+      
+
+      end 
+
+    end 
+
+
+
+
+end 
+
+
+
+
+shots = {}  -- table with all shurikens 
+
+function shoot(x, y , dirx, diry) -- makes shuriken appear on the screen from pont where hero faces
+
+  table.insert ( shots, {img = love.graphics.newImage("hero/shot.png"), pos_x = x, pos_y = y , 
+
+      dir_x = dirx,   dir_y=diry,collision = false}) 
+
+  end 
+
+  
+
+  
+
+function checkCol( x1, y1, w1,h1, x2,y2,w2,h2) 
+
+   return x1 < x2+w2 and x2 < x1+w1 and y1 < y2+h2 and y2 < y1+h1
+
+end 
+
+
+
+
+-------------------------------------------------------------------------
 
 
 
