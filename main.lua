@@ -748,6 +748,7 @@ function love.draw()
 
 
 
+
 	if gamestate == "jogando" then
 
 
@@ -794,22 +795,111 @@ function love.draw()
 
 		love.graphics.setColor(255, 255, 255) 
 
+
+
+
 		love.graphics.draw(hero.walk[hero.anim_frame], hero.pos_x ,  -- desenha heroi
 
+   hero.pos_y, 0, 1/2,1/2, hero.walk[hero.anim_frame]:getWidth()/2, hero.walk[hero.anim_frame]:getHeight()/2 )
+
+    
+
+    for i,v in ipairs(enemy) do
+
+     love.graphics.draw( v.img[v.frame] , v.pos_x, v.pos_y)   -- draws enemies onscreen 
+
+    end
 
 
 
-		for i,v in ipairs(enemy) do
-			if v.tipo == "gomba" then 
-				v.img[1] = love.graphics.newImage("enemies/gomba1.png") 
-				v.img[2] = love.graphics.newImage("enemies/gomba2.png")
-			end 
 
-			love.graphics.draw( v.img[v.frame] , v.pos_x, v.pos_y)
+local dir_y= 0  -- control shuriken aiming through hero frame
+
+local dir_x= 1 
 
 
-		end
-	end
+
+
+
+
+
+  if (love.keyboard.wasPressed("space")) then
+
+    if hero.anim_frame>=9 and hero.anim_frame <= 12 then -- Up 
+
+      dir_y = -1 
+
+      dir_x = 0 
+
+    end 
+
+    if hero.anim_frame>=13 and hero.anim_frame <= 16  then -- Down
+
+      dir_y = 1 
+
+      dir_x= 0 
+
+    end 
+
+    if hero.anim_frame <= 4   then -- Left 
+
+      dir_x= 1 
+
+      dir_y= 0 
+
+    end
+
+    if hero.anim_frame>=5 and hero.anim_frame <= 8   then -- Righ 
+
+      dir_x= -1 
+
+    end
+
+    
+
+   
+
+   shoot(hero.pos_x, hero.pos_y, dir_x , dir_y ) 
+
+  
+
+ end 
+
+ 
+
+     for i, v in pairs(shots) do 
+
+     love.graphics.draw( v.img, v.pos_x, v.pos_y ) 
+
+     -- cheCol( v.pos_y, v.pos_x, v.img:getWidth()/2, v.img:getHeight()/2) 
+
+     love.keyboard.updateKeys()
+
+   end 
+
+    
+
+ love.graphics.setColor(100,0,0)
+
+ love.graphics.rectangle("fill", 10, 15, hero.life , 15 ) 
+ love.graphics.setColor(255,255,255)
+ love.graphics.setFont(fonte,50)
+ --love.graphics.print("PAUSE",400,22)
+end 
+
+
+
+
+love.graphics.setColor(255, 255, 255) 
+
+
+
+
+
+
+
+
+
 
 	if gamestate == "menu" then
 
