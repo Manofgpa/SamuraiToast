@@ -1,13 +1,47 @@
 require "menu"
+--require "camera"
 
 local gamera = require "gamera"
 
 local cam = gamera.new(0,0,2000,2000)
+local isDown = love.keyboard.isDown
+local floor = math.floor
+local function makeZero(x,minX,maxX)
+  if x > maxX or x < minX then return x end
+  return 0
+end
 
+local min, max = math.min, math.max
 
+local function updateTarget(dt)
+  enemy.pos_x, enemy.pos_y = cam:toWorld(love.mouse.getPosition())
+end
+
+local function updatePlayer(dt)
+  local dx,dy = makeZero(enemy.pos_x - hero.pos_x, -5,5),
+                makeZero(enemy.pos_y - hero.pos_y, -5,5)
+  hero.pos_x = hero.pos_x + 2 * dx * dt
+  hero.pos_y = hero.pos_y + 2 * dy * dt
+end
+
+local function updateCameras(dt)
+	
+  cam:setPosition(hero.pos_x, hero.pos_y)
+  
+
+  --[[local scaleFactor = isDown('down') and -0.8 or (isDown('up') and 0.8 or 0)
+  cam:setScale(cam:getScale() + scaleFactor * dt)
+
+  local angleFactor = isDown('left') and -0.8 or (isDown('right') and 0.8 or 0)
+  cam:setAngle(cam:getAngle() + angleFactor * dt) ]]
+end
+
+-- acaba aqui
 function love.load()
   
- 
+	cam = gamera.new(0, 0, 1400,1400)
+  cam:setWindow(0,0,800,600)
+	
 	horadoshow = love.audio.newSource("sons/horadoshow.mp3","stream")
 
 	--[[tasaino = love.audio.newSource("tasaino.mp3","stream")
@@ -129,9 +163,17 @@ end
 
 function love.update(dt)
 
+  updateCameras(dt)
+  updateTarget(dt)
 
-
-
+	--[[if hero.pos_x > love.graphics.getWidth() / 2 then
+		camera.x = hero.pos_x - love.graphics.getWidth() / 2
+	end
+	if hero.pos_y > love.graphics.getWidth() / 2 then
+		camera.y = hero.pos_y - love.graphics.getWidth() / 2
+	end ]]
+	
+	
 
 	mousex = love.mouse.getX()
 
@@ -538,9 +580,9 @@ hero= {
 
 	walk = {} , 
 
-	pos_x=400  , 
+	pos_x = 700  , 
 
-	pos_y= 300  , 
+	pos_y= 700  , 
 
 	velocidade = 120  ,
 
@@ -752,6 +794,9 @@ end
 
 function love.draw()
 
+	-- camera:set()
+	 cam:draw(function(l,t,w,h)
+
 
 	if gamestate == "jogando" then
 
@@ -890,19 +935,13 @@ local dir_x= 1
  love.graphics.setFont(fonte,50)
  --love.graphics.print("PAUSE",400,22)
 end 
+end)
 
 
 love.graphics.setColor(255, 255, 255) 
 
-
-
-
-
-
--- git
-
-
-
+--camera:unset()
+	
 	if gamestate == "menu" then
 
 		love.graphics.draw(menu,0,0,ox,1.35)
@@ -910,10 +949,6 @@ love.graphics.setColor(255, 255, 255)
 		love.graphics.draw(samuraimenu,140,100)
 
 		button_draw()
-
-
-
-
 	end
 
 end 
