@@ -39,7 +39,7 @@ end
 -- acaba aqui
 function love.load()
   
-	cam = gamera.new(0, 0, 1400,1400)
+	cam = gamera.new(0, 0, 1000,800)
   cam:setWindow(0,0,800,600)
 	
 	horadoshow = love.audio.newSource("sons/horadoshow.mp3","stream")
@@ -803,9 +803,9 @@ function love.draw()
 
    
 
-		for i=1, 37, 1 do --Percorre a matriz e desenha quadrados imagens
+		for i=1, 58 , 1 do --Percorre a matriz e desenha quadrados imagens
 
-			for j=1, 70, 1 do
+			for j=1, 88, 1 do
 
 				if (mapa[i][j] == "G") then 
 
