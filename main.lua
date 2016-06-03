@@ -39,7 +39,7 @@ end
 -- acaba aqui
 function love.load()
   
-	cam = gamera.new(0, 0, 1000,800)
+	cam = gamera.new(0, 0, 1200,1200)
   cam:setWindow(0,0,800,600)
 	
 	horadoshow = love.audio.newSource("sons/horadoshow.mp3","stream")
