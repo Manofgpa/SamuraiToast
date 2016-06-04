@@ -5,43 +5,32 @@ local gamera = require "gamera"
 
 local cam = gamera.new(0,0,2000,2000)
 local isDown = love.keyboard.isDown
-local floor = math.floor
-local function makeZero(x,minX,maxX)
-  if x > maxX or x < minX then return x end
-  return 0
-end
 
 local min, max = math.min, math.max
 
 local function updateTarget(dt)
-  enemy.pos_x, enemy.pos_y = cam:toWorld(love.mouse.getPosition())
+	enemy.pos_x, enemy.pos_y = cam:toWorld(love.mouse.getPosition())
 end
 
-local function updatePlayer(dt)
-  local dx,dy = makeZero(enemy.pos_x - hero.pos_x, -5,5),
-                makeZero(enemy.pos_y - hero.pos_y, -5,5)
-  hero.pos_x = hero.pos_x + 2 * dx * dt
-  hero.pos_y = hero.pos_y + 2 * dy * dt
-end
 
 local function updateCameras(dt)
-	
-  cam:setPosition(hero.pos_x, hero.pos_y)
-  
 
-  --[[local scaleFactor = isDown('down') and -0.8 or (isDown('up') and 0.8 or 0)
-  cam:setScale(cam:getScale() + scaleFactor * dt)
+	cam:setPosition(hero.pos_x, hero.pos_y)
 
-  local angleFactor = isDown('left') and -0.8 or (isDown('right') and 0.8 or 0)
-  cam:setAngle(cam:getAngle() + angleFactor * dt) ]]
+
+	local scaleFactor = isDown('home') and -0.8 or (isDown('end') and 0.8 or 0)
+	cam:setScale(cam:getScale() + scaleFactor * dt)
+
+	--[[local angleFactor = isDown("3") and -0.8 or (isDown("4") and 0.8 or 0)
+  cam:setAngle(cam:getAngle() + angleFactor * dt)]]
 end
 
 -- acaba aqui
 function love.load()
-  
+
 	cam = gamera.new(0, 0, 1200,1200)
-  cam:setWindow(0,0,800,600)
-	
+	cam:setWindow(0,0,800,600)
+
 	horadoshow = love.audio.newSource("sons/horadoshow.mp3","stream")
 
 	--[[tasaino = love.audio.newSource("tasaino.mp3","stream")
@@ -120,29 +109,29 @@ function love.load()
 
 
 
-  if gamestate == "menu" then
-	button_spawn(390,300,"Start","start")
+	if gamestate == "menu" then
+		button_spawn(390,300,"Start","start")
 
-	button_spawn(10,550,"Quit","sair")
-end
+		button_spawn(10,550,"Quit","sair")
+	end
 
 
-  if gamestate == "jogando" then
-      button_spawn(400,22,"Pause","pause")
-    end
-    
+	if gamestate == "jogando" then
+		button_spawn(400,22,"Pause","pause")
+	end
 
-  
 
-  timer= 0 
 
-  momento = os.time()
 
-  passado = 0 
+	timer= 0 
 
-  intervalo = 3
+	momento = os.time()
 
-  count = 0 
+	passado = 0 
+
+	intervalo = 3
+
+	count = 0 
 
 
 
@@ -163,8 +152,13 @@ end
 
 function love.update(dt)
 
-  updateCameras(dt)
-  updateTarget(dt)
+	updateCameras(dt)
+	updateTarget(dt)
+	
+	if hero.life = 0 then
+		gamestate = "gameover"
+	end
+	
 
 	--[[if hero.pos_x > love.graphics.getWidth() / 2 then
 		camera.x = hero.pos_x - love.graphics.getWidth() / 2
@@ -172,340 +166,340 @@ function love.update(dt)
 	if hero.pos_y > love.graphics.getWidth() / 2 then
 		camera.y = hero.pos_y - love.graphics.getWidth() / 2
 	end ]]
-	
-	
-
-	mousex = love.mouse.getX()
-
-	mousey = love.mouse.getY()
 
 
 
+mousex = love.mouse.getX()
 
-	if gamestate == "menu" then
+mousey = love.mouse.getY()
 
-		button_check()
+
+
+
+if gamestate == "menu" then
+
+	button_check()
+
+end
+
+
+
+
+if gamestate == "jogando" then
+
+
+	love.graphics.print("II",300,200)
+
+	momento = os.time() 
+
+	if (momento - passado) > intervalo then 
+
+		enemyCall()  
+
+		passado = os.time() 
+
+		count = count + 1 
+
+		if math.mod( count, 5 ) == 0 then
+
+			intervalo = intervalo - 0.5 
+
+			if intervalo <=  0.5 then 
+
+				intervalo = 0.6 
+
+			end   
+
+		end 
+
+	end 
+
+
+
+	hero.shot = hero.shot - dt
+
+
+
+
+
+	if love.keyboard.isDown("right") then
+
+		hero.pos_x = hero.pos_x + (hero.velocidade * dt)
+
+		hero.anim_time = hero.anim_time + dt -- incrementa o tempo usando dt
+
+		if hero.anim_time > 0.1 then -- quando acumular mais de 0.1
+
+			hero.anim_frame = hero.anim_frame + 1 -- avança para proximo frame
+
+			if hero.anim_frame > 4 then 
+
+				hero.anim_frame = 1
+
+			end
+
+			hero.anim_time = 0 -- reinicializa a contagem do tempo
+
+		end
 
 	end
 
 
 
 
-	if gamestate == "jogando" then
-
-
-    love.graphics.print("II",300,200)
-
-		momento = os.time() 
-
-    if (momento - passado) > intervalo then 
-
-      enemyCall()  
-
-      passado = os.time() 
-
-      count = count + 1 
-
-    if math.mod( count, 5 ) == 0 then
-
-       intervalo = intervalo - 0.5 
-
-         if intervalo <=  0.5 then 
-
-            intervalo = 0.6 
-
-        end   
-
-    end 
-
-    end 
-
-  
 
 
 
+	if love.keyboard.isDown("left") then
 
+		hero.pos_x = hero.pos_x - (hero.velocidade * dt)
 
+		hero.anim_time = hero.anim_time + dt -- incrementa o tempo usando dt
 
+		if hero.anim_time > 0.1 then -- quando acumular mais de 0.1
 
-		if love.keyboard.isDown("right") then
+			hero.anim_frame = hero.anim_frame + 1 -- avança para proximo frame
 
-			hero.pos_x = hero.pos_x + (hero.velocidade * dt)
+			if hero.anim_frame<5 or hero.anim_frame > 8 then 
 
-			hero.anim_time = hero.anim_time + dt -- incrementa o tempo usando dt
-
-			if hero.anim_time > 0.1 then -- quando acumular mais de 0.1
-
-				hero.anim_frame = hero.anim_frame + 1 -- avança para proximo frame
-
-				if hero.anim_frame > 4 then 
-
-					hero.anim_frame = 1
-
-				end
-
-				hero.anim_time = 0 -- reinicializa a contagem do tempo
+				hero.anim_frame = 5
 
 			end
 
+			hero.anim_time = 0 -- reinicializa a contagem do tempo
+
 		end
 
+	end
 
 
 
 
+	if love.keyboard.isDown("down") then
 
+		hero.pos_y = hero.pos_y + (hero.velocidade * dt)
 
-		if love.keyboard.isDown("left") then
+		hero.anim_time = hero.anim_time + dt -- incrementa o tempo usando dt
 
-			hero.pos_x = hero.pos_x - (hero.velocidade * dt)
+		if hero.anim_time > 0.1 then -- quando acumular mais de 0.1
 
-			hero.anim_time = hero.anim_time + dt -- incrementa o tempo usando dt
+			hero.anim_frame = hero.anim_frame + 1 -- avança para proximo frame
 
-			if hero.anim_time > 0.1 then -- quando acumular mais de 0.1
+			if hero.anim_frame<5 or hero.anim_frame > 8 then 
 
-				hero.anim_frame = hero.anim_frame + 1 -- avança para proximo frame
-
-				if hero.anim_frame<5 or hero.anim_frame > 8 then 
-
-					hero.anim_frame = 5
-
-				end
-
-				hero.anim_time = 0 -- reinicializa a contagem do tempo
+				hero.anim_frame = 5
 
 			end
 
+			hero.anim_time = 0 -- reinicializa a contagem do tempo
+
 		end
 
+	end
 
 
 
-		if love.keyboard.isDown("down") then
 
-			hero.pos_y = hero.pos_y + (hero.velocidade * dt)
+	if love.keyboard.isDown("up") then
 
-			hero.anim_time = hero.anim_time + dt -- incrementa o tempo usando dt
+		hero.pos_y = hero.pos_y - (hero.velocidade * dt)
 
-			if hero.anim_time > 0.1 then -- quando acumular mais de 0.1
+		hero.anim_time = hero.anim_time + dt -- incrementa o tempo usando dt
 
-				hero.anim_frame = hero.anim_frame + 1 -- avança para proximo frame
+		if hero.anim_time > 0.1 then -- quando acumular mais de 0.1
 
-				if hero.anim_frame<5 or hero.anim_frame > 8 then 
+			hero.anim_frame = hero.anim_frame + 1 -- avança para proximo frame
 
-					hero.anim_frame = 5
+			if hero.anim_frame<5 or hero.anim_frame > 8 then 
 
-				end
-
-				hero.anim_time = 0 -- reinicializa a contagem do tempo
+				hero.anim_frame = 1
 
 			end
 
-		end
-
-
-
-
-		if love.keyboard.isDown("up") then
-
-			hero.pos_y = hero.pos_y - (hero.velocidade * dt)
-
-			hero.anim_time = hero.anim_time + dt -- incrementa o tempo usando dt
-
-			if hero.anim_time > 0.1 then -- quando acumular mais de 0.1
-
-				hero.anim_frame = hero.anim_frame + 1 -- avança para proximo frame
-
-				if hero.anim_frame<5 or hero.anim_frame > 8 then 
-
-					hero.anim_frame = 1
-
-				end
-
-				hero.anim_time = 0 -- reinicializa a contagem do tempo
-
-			end
+			hero.anim_time = 0 -- reinicializa a contagem do tempo
 
 		end
 
-
-
-
-		local dist_x= 1 
-
-		local dist_y= 1
+	end
 
 
 
 
-		for i,v in ipairs(enemy) do
+	local dist_x= 1 
 
-			if v.tipo == "gomba" then
+	local dist_y= 1
 
-				v.anim_time = v.anim_time + dt 
 
-				if v.anim_time > 0.2 then 
 
-					v.frame = v.frame +1 
 
-					if v.frame > 2 then 
+	for i,v in ipairs(enemy) do
 
-						v.frame=1
+		if v.tipo == "gomba" then
 
-					end 
+			v.anim_time = v.anim_time + dt 
 
-					v.anim_time= 0 
+			if v.anim_time > 0.2 then 
+
+				v.frame = v.frame +1 
+
+				if v.frame > 2 then 
+
+					v.frame=1
 
 				end 
 
-			end 
-
-
-
-
-			dist_x= hero.pos_x - v.pos_x
-
-			dist_y= hero.pos_y - v.pos_y
-
-
-
-
-			if dist_x <= 0 then
-
-				v.pos_x = v.pos_x - (80 *dt) 
-
-			end 
-
-
-
-
-			if dist_y  <= 0  then 
-
-				v.pos_y = v.pos_y - (80 *dt) 
-
-			end 
-
-
-
-
-			if dist_x >= 0  then     
-
-				v.pos_x = v.pos_x + (80 *dt) 
-
-			end
-
-
-
-
-			if dist_y >= 0  then     
-
-				v.pos_y = v.pos_y + (80 *dt) 
+				v.anim_time= 0 
 
 			end 
 
 		end 
 
-     for j,s in ipairs(shots) do  -- percorre todas instancias da tabela shots
 
-          s.pos_x = s.pos_x + s.dir_x * ( 150* dt ) 
 
-          s.pos_y = s.pos_y + s.dir_y * (150*dt ) 
 
-        end 
+		dist_x= hero.pos_x - v.pos_x
 
- 
+		dist_y= hero.pos_y - v.pos_y
 
-       for j,s in ipairs(shots) do  -- checa colisao de inimigos com o shot 
 
-        for i,v in ipairs(enemy) do   
 
-         if  checkCol(s.pos_x, s.pos_y, s.img:getWidth()/2, s.img:getHeight()/2, v.pos_x, v.pos_y, 4, 4)  then -- checando shots com inimigos 
 
-              table.remove(enemy, i)
+		if dist_x <= 0 then
 
-               table.remove(shots, j)
+			v.pos_x = v.pos_x - (80 *dt) 
 
-              end
+		end 
 
-           end 
 
-        end 
 
-        
 
-        for i,v in ipairs(enemy) do -- percorre tabela de inimigos checa cada um com o heroi 
+		if dist_y  <= 0  then 
 
-         if checkCol(hero.pos_x, hero.pos_y, hero.walk[hero.anim_frame]:getWidth()/2,hero.walk[hero.anim_frame]:getHeight()/2,
+			v.pos_y = v.pos_y - (80 *dt) 
 
-                                         v.pos_x, v.pos_y,5, 5) then -- checando hero com inimigos  
+		end 
 
-              hero.life = hero.life -  (40*dt)
 
-         end
 
-        
 
-    end 
+		if dist_x >= 0  then     
 
-    
+			v.pos_x = v.pos_x + (80 *dt) 
 
-    width, height = love.window.getDesktopDimensions( display ) 
+		end
 
-    
 
-    for i,v in ipairs(shots) do  -- remove shots que alcancam as extremidades da tela 
 
-      if v.pos_x >= width  then
 
-          table.remove(shots, i ) 
+		if dist_y >= 0  then     
 
-        elseif v.pos_x <= 0 then 
+			v.pos_y = v.pos_y + (80 *dt) 
 
-         table.remove(shots, i)
+		end 
 
-        
+	end 
 
-       end 
+	for j,s in ipairs(shots) do  -- percorre todas instancias da tabela shots
 
-      if v.pos_y >= height then 
+		s.pos_x = s.pos_x + s.dir_x * ( 230 * dt ) 
 
-          table.remove(shots, i ) 
+		s.pos_y = s.pos_y + s.dir_y * ( 230 * dt ) 
 
-        elseif v.pos_y <= 0 then 
+	end 
 
-         table.remove(shots, i)
 
-      end 
 
-    end 
+	for j,s in ipairs(shots) do  -- checa colisao de inimigos com o shot 
 
-   
+		for i,v in ipairs(enemy) do   
 
-    
+			if  checkCol(s.pos_x, s.pos_y, s.img:getWidth()/2, s.img:getHeight()/2, v.pos_x, v.pos_y, 4, 4)  then -- checando shots com inimigos 
 
-   
+				table.remove(enemy, i)
 
- 
+				table.remove(shots, j)
+
+			end
+
+		end 
+
+	end 
+
+
+
+	for i,v in ipairs(enemy) do -- percorre tabela de inimigos checa cada um com o heroi 
+
+		if checkCol(hero.pos_x, hero.pos_y, hero.walk[hero.anim_frame]:getWidth()/2,hero.walk[hero.anim_frame]:getHeight()/2,
+
+			v.pos_x, v.pos_y,5, 5) then -- checando hero com inimigos  
+
+			hero.life = hero.life -  (40*dt)
+
+		end
+
+
+
+	end 
+
+
+
+	width, height = love.window.getDesktopDimensions( display ) 
+
+
+
+	for i,v in ipairs(shots) do  -- remove shots que alcancam as extremidades da tela 
+
+		if v.pos_x >= width  then
+
+			table.remove(shots, i ) 
+
+		elseif v.pos_x <= 0 then 
+
+			table.remove(shots, i)
+
+
+
+		end 
+
+		if v.pos_y >= height then 
+
+			table.remove(shots, i ) 
+
+		elseif v.pos_y <= 0 then 
+
+			table.remove(shots, i)
+
+		end 
+
+	end 
+
+
+
+
+
+
+
+
 
 end 
 
-    if (love.keyboard.wasPressed("escape")) then
+if (love.keyboard.wasPressed("escape")) then
 
-      love.event.quit() --SAIR DO JOGO
+	love.event.quit() --SAIR DO JOGO
 
-    end
-
-
-
-
- 
-
- end 
+end
 
 
 
 
- 
+
+
+end 
+
+
+
+
+
 
 
 
@@ -588,7 +582,11 @@ hero= {
 
 	anim_time=0, 
 
-  life = 250
+	cooldown = 0.5,
+
+	shot = 0,
+
+	life = 250
 
 }
 
@@ -730,29 +728,29 @@ function enemyCall() --faz inimigos surgir na tela de tipos aleatorios e margens
 
 	end 
 
-  
 
-  for i, v in ipairs(enemy) do 
 
-      if v.tipo == "gomba" then 
+	for i, v in ipairs(enemy) do 
 
-        v.img[1] = love.graphics.newImage("enemies/gomba1.png") 
+		if v.tipo == "gomba" then 
 
-        v.img[2] = love.graphics.newImage("enemies/gomba2.png")
+			v.img[1] = love.graphics.newImage("enemies/gomba1.png") 
 
-      
+			v.img[2] = love.graphics.newImage("enemies/gomba2.png")
 
-      elseif v.tipo == "kopa" then  
 
-        v.img[1] = love.graphics.newImage("enemies/kopa1.png") 
 
-        v.img[2] = love.graphics.newImage("enemies/kopa2.png")
+		elseif v.tipo == "kopa" then  
 
-      
+			v.img[1] = love.graphics.newImage("enemies/kopa1.png") 
 
-      end 
+			v.img[2] = love.graphics.newImage("enemies/kopa2.png")
 
-    end 
+
+
+		end 
+
+	end 
 
 
 
@@ -766,19 +764,19 @@ shots = {}  -- table with all shurikens
 
 function shoot(x, y , dirx, diry) -- makes shuriken appear on the screen from pont where hero faces
 
-  table.insert ( shots, {img = love.graphics.newImage("hero/shot.png"), pos_x = x, pos_y = y , 
+	table.insert ( shots, {img = love.graphics.newImage("hero/shot.png"), pos_x = x, pos_y = y , 
 
-      dir_x = dirx,   dir_y=diry,collision = false}) 
+			dir_x = dirx,   dir_y=diry,collision = false}) 
 
-  end 
+end 
 
-  
 
-  
+
+
 
 function checkCol( x1, y1, w1,h1, x2,y2,w2,h2) 
 
-   return x1 < x2+w2 and x2 < x1+w1 and y1 < y2+h2 and y2 < y1+h1
+	return x1 < x2+w2 and x2 < x1+w1 and y1 < y2+h2 and y2 < y1+h1
 
 end 
 
@@ -795,43 +793,46 @@ end
 function love.draw()
 
 	-- camera:set()
-	 cam:draw(function(l,t,w,h)
 
 
-	if gamestate == "jogando" then
+	cam:draw(function(l,t,w,h)
+
+			if gamestate == "jogando" then
 
 
-   
 
-		for i=1, 58 , 1 do --Percorre a matriz e desenha quadrados imagens
 
-			for j=1, 88, 1 do
+				for i=1, 58 , 1 do --Percorre a matriz e desenha quadrados imagens
 
-				if (mapa[i][j] == "G") then 
+					for j=1, 88, 1 do
 
-					love.graphics.draw(tilesetImage, tileQuads[60], (j * tileSize) - tileSize, (i * tileSize) - tileSize)
+						if (mapa[i][j] == "G") then 
 
-				elseif (mapa[i][j] == "D") then
+							love.graphics.draw(tilesetImage, tileQuads[60], (j * tileSize) - tileSize, (i * tileSize) - tileSize)
 
-					love.graphics.draw(love.graphics.newImage("hero/tree.png"),(j * tileSize) - tileSize, (i * tileSize) - tileSize)
+						elseif (mapa[i][j] == "D") then
 
-				elseif (mapa[i][j] == "C") then
+							love.graphics.draw(love.graphics.newImage("hero/tree.png"),(j * tileSize) - tileSize, (i * tileSize) - tileSize)
 
-					love.graphics.draw(tilesetImage, tileQuads[7], (j * tileSize) - tileSize, (i * tileSize) - tileSize)
+						elseif (mapa[i][j] == "C") then
 
-				elseif (mapa[i][j] == "P") then
+							love.graphics.draw(tilesetImage, tileQuads[7], (j * tileSize) - tileSize, (i * tileSize) - tileSize)
 
-					love.graphics.draw(tilesetImage, tileQuads[8],(j * tileSize) - tileSize, (i * tileSize) - tileSize)
+						elseif (mapa[i][j] == "P") then
 
-				elseif (mapa[i][j] == "B") then
+							love.graphics.draw(tilesetImage, tileQuads[8],(j * tileSize) - tileSize, (i * tileSize) - tileSize)
 
-					love.graphics.draw(tilesetImage, tileQuads[6],(j * tileSize) - tileSize, (i * tileSize) - tileSize)
+						elseif (mapa[i][j] == "B") then
+
+							love.graphics.draw(tilesetImage, tileQuads[6],(j * tileSize) - tileSize, (i * tileSize) - tileSize)
+
+						end
+
+					end
 
 				end
 
-			end
 
-		end
 
 
 
@@ -840,108 +841,108 @@ function love.draw()
 
 
 
+				love.graphics.setColor(255, 255, 255) 
 
 
-		love.graphics.setColor(255, 255, 255) 
 
 
+				love.graphics.draw(hero.walk[hero.anim_frame], hero.pos_x ,  -- desenha heroi
 
+					hero.pos_y, 0, 1/2,1/2, hero.walk[hero.anim_frame]:getWidth()/2, hero.walk[hero.anim_frame]:getHeight()/2 )
 
-		love.graphics.draw(hero.walk[hero.anim_frame], hero.pos_x ,  -- desenha heroi
 
-   hero.pos_y, 0, 1/2,1/2, hero.walk[hero.anim_frame]:getWidth()/2, hero.walk[hero.anim_frame]:getHeight()/2 )
 
-    
+				for i,v in ipairs(enemy) do
 
-    for i,v in ipairs(enemy) do
+					love.graphics.draw( v.img[v.frame] , v.pos_x, v.pos_y)   -- draws enemies onscreen 
 
-     love.graphics.draw( v.img[v.frame] , v.pos_x, v.pos_y)   -- draws enemies onscreen 
+				end
 
-    end
 
 
 
+				local dir_y= 0  -- control shuriken aiming through hero frame
 
-local dir_y= 0  -- control shuriken aiming through hero frame
+				local dir_x= 1 
 
-local dir_x= 1 
 
 
 
 
 
 
+				while (love.keyboard.isDown("space")) and hero.shot <=0 do
 
-  if (love.keyboard.wasPressed("space")) then
+					if hero.anim_frame>=9 and hero.anim_frame <= 12 then -- Up 
 
-    if hero.anim_frame>=9 and hero.anim_frame <= 12 then -- Up 
+						dir_y = -1 
 
-      dir_y = -1 
+						dir_x = 0 
 
-      dir_x = 0 
+					end 
 
-    end 
+					if hero.anim_frame>=13 and hero.anim_frame <= 16  then -- Down
 
-    if hero.anim_frame>=13 and hero.anim_frame <= 16  then -- Down
+						dir_y = 1 
 
-      dir_y = 1 
+						dir_x= 0 
 
-      dir_x= 0 
+					end 
 
-    end 
+					if hero.anim_frame <= 4   then -- Left 
 
-    if hero.anim_frame <= 4   then -- Left 
+						dir_x= 1 
 
-      dir_x= 1 
+						dir_y= 0 
 
-      dir_y= 0 
+					end
 
-    end
+					if hero.anim_frame>=5 and hero.anim_frame <= 8   then -- Righ 
 
-    if hero.anim_frame>=5 and hero.anim_frame <= 8   then -- Righ 
+						dir_x= -1 
 
-      dir_x= -1 
+					end
 
-    end
 
-    
 
-   
 
-   shoot(hero.pos_x, hero.pos_y, dir_x , dir_y ) 
 
-  
+					shoot(hero.pos_x, hero.pos_y, dir_x , dir_y ) 
+					hero.shot = hero.cooldown
 
- end 
 
- 
+				end 
 
-     for i, v in pairs(shots) do 
 
-     love.graphics.draw( v.img, v.pos_x, v.pos_y ) 
 
-     -- cheCol( v.pos_y, v.pos_x, v.img:getWidth()/2, v.img:getHeight()/2) 
+				for i, v in pairs(shots) do 
 
-     love.keyboard.updateKeys()
+					love.graphics.draw( v.img, v.pos_x, v.pos_y ) 
 
-   end 
+					-- cheCol( v.pos_y, v.pos_x, v.img:getWidth()/2, v.img:getHeight()/2) 
 
-    
+					love.keyboard.updateKeys()
 
- love.graphics.setColor(100,0,0)
+				end 
 
- love.graphics.rectangle("fill", 10, 15, hero.life , 15 ) 
- love.graphics.setColor(255,255,255)
- love.graphics.setFont(fonte,50)
- --love.graphics.print("PAUSE",400,22)
-end 
-end)
 
 
-love.graphics.setColor(255, 255, 255) 
 
---camera:unset()
-	
+				love.graphics.setColor(255,255,255)
+				love.graphics.setFont(fonte,50)
+
+			end 
+		end)
+	if gamestate == "jogando" then
+		love.graphics.setColor(100,0,0)
+		love.graphics.rectangle("fill", 10, 15, hero.life ,15)
+		love.graphics.setColor(255,255,255)
+	end
+
+	love.graphics.setColor(255, 255, 255) 
+
+
+
 	if gamestate == "menu" then
 
 		love.graphics.draw(menu,0,0,ox,1.35)
@@ -950,5 +951,6 @@ love.graphics.setColor(255, 255, 255)
 
 		button_draw()
 	end
+
 
 end 
