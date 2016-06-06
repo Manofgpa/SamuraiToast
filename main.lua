@@ -27,7 +27,8 @@ end
 
 -- acaba aqui
 function love.load()
-
+	
+	gameover = "Game Over"
 	cam = gamera.new(0, 0, 1200,1200)
 	cam:setWindow(0,0,800,600)
 
@@ -154,8 +155,8 @@ function love.update(dt)
 
 	updateCameras(dt)
 	updateTarget(dt)
-	
-	if hero.life = 0 then
+
+	if hero.life < 1 then
 		gamestate = "gameover"
 	end
 	
@@ -942,6 +943,11 @@ function love.draw()
 	love.graphics.setColor(255, 255, 255) 
 
 
+
+	if gamestate == "gameover" then
+		love.graphics.setNewFont("fontes/fonteninja.ttf",90)
+		love.graphics.print(gameover,150,100)
+	end
 
 	if gamestate == "menu" then
 
