@@ -361,8 +361,7 @@ function love.update(dt)
 				end 
 				vel = false 
 			end 
-		end 
-
+		end
 
 		for i,v in ipairs(powers) do 
 			v.time = v.time+ dt*10 
@@ -370,23 +369,15 @@ function love.update(dt)
 				table.remove(powers ,i ) 
 			end 
 		end 
-
-
 	end 
+
 	if (love.keyboard.wasPressed("escape")) then
 		love.event.quit() --SAIR DO JOGO
-
 	end
-
 end 
 
+powers={}
 
-
-
-
-
-
-powers={} 
 function power()
 	tipo = love.math.random(1,3) -- 3 tipos de power ups 
 
@@ -399,7 +390,6 @@ function power()
 	end 
 	table.insert(powers , {img = img , tipo = tipo , pos_x = love.math.random(0,1000) , pos_y= love.math.random(0,1000), time=0} )
 end 
-
 
 love.keyboard.keysPressed = { }
 love.keyboard.keysReleased = { }
@@ -698,13 +688,10 @@ function love.draw()
 	love.graphics.setColor(255, 255, 255) 
 
 	if gamestate == "gameover" then
-		button_clear() 
 		love.graphics.setNewFont("fontes/fonteninja.ttf",90)
 		love.graphics.draw(telagameover,0,0)
 		love.graphics.print(gameover,150,20) 
 		button_draw()
-		love.graphics.print(gameover,150,100) 
-		button_draw() 
 	end
 
 	if gamestate == "menu" then
