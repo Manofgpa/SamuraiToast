@@ -118,11 +118,12 @@ function love.load()
 		button_spawn(400,22,"Pause","pause")
 	end
   
-  if gamestate == "gameover" then
+  --[[if gamestate == "gameover" then
     button_spawn(620,530,"Restart","restart")
     button_spawn(50,530,"Quit","sair")
     button_spawn(260,530,"Leaderboard","leaderboard")
 	end
+	]]
 
 
 
@@ -155,6 +156,12 @@ end
 -------------------------------------------------------------------------
 
 function love.update(dt)
+	
+  if gamestate == "gameover" then
+    button_spawn(620,530,"Restart","restart")
+    button_spawn(50,530,"Quit","sair")
+    button_spawn(260,530,"Leaderboard","leaderboard")
+	end
 
 	updateCameras(dt)
 	updateTarget(dt)
@@ -162,6 +169,8 @@ function love.update(dt)
 	if hero.life < 1 then
 		gamestate = "gameover"
 	end
+	
+	
 
 mousex = love.mouse.getX()
 mousey = love.mouse.getY()
@@ -177,6 +186,8 @@ end
 
 
 if gamestate == "jogando" then
+	
+		button_clear()
  
   love.audio.play(gamesong , { channel=0, loops=-1, fadein=5000 } )
 
@@ -381,6 +392,8 @@ if (love.keyboard.wasPressed("escape")) then
 
 end
 
+
+
 end 
 
 
@@ -503,7 +516,8 @@ function LoadTiles(filename, nx, ny)
 
 		end
 
-	end
+end
+
 
 end
 
@@ -701,7 +715,8 @@ function love.draw()
 		love.graphics.setNewFont("fontes/fonteninja.ttf",90)
     love.graphics.draw(telagameover,0,0)
 		love.graphics.print(gameover,150,20) 
-    button_draw() 
+		button_draw()
+     
 	end
 
 	if gamestate == "menu" then
