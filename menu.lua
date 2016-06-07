@@ -20,19 +20,16 @@ function button_draw()
 		if v.mouseover == true then
 			love.graphics.setColor(love.math.random(255),love.math.random(255),love.math.random(255))
 		end
-		if v.mouseover == true and v.id == "sair" then
+		if v.mouseover == true and v.id == "sair" and gamestate == "menu" then
 			love.audio.play(nyan)
 			love.graphics.print("NAO SAI",love.math.random(800),love.math.random(600))
 			love.graphics.print("NAO SAI",love.math.random(800),love.math.random(600))
 		else
 			love.audio.pause(nyan)
 		end
-		if v.mouseover == true and v.id == "start" then
-			love.audio.play(horadoshow)
-end
 		love.graphics.setFont(fonte)
 		love.graphics.print(v.text,v.x,v.y)
-
+	
 
 	end
 end
@@ -45,6 +42,7 @@ function button_click(x,y)
 			end
 			if v.id == "start" then
 				gamestate = "jogando"
+				love.audio.play(horadoshow)
 			end
       if v.id == "restart" then
         gamestate = "jogando"
