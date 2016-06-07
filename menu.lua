@@ -4,6 +4,10 @@
 button = {}
 
 
+function button_clear()
+  button = {}
+end
+
 function button_spawn(x,y,text,id)
 	table.insert(button, {x = x,y = y, text = text, id = id, mouseover = false})
 end
@@ -42,6 +46,10 @@ function button_click(x,y)
 			if v.id == "start" then
 				gamestate = "jogando"
 			end
+      if v.id == "restart" then
+        gamestate = "jogando"
+        --love.audio.play(queromais)
+       end 
 		end
 	end
 end
