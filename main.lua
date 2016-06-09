@@ -21,9 +21,16 @@ end
 
 function gameReset()
   hero.life = 250
+  hero.pos_x = 700
+  hero.pos_y = 700
+  points = 0
+  table.remove(shots)
+  table.remove(enemy)
+  table.remove(powers)
   end
 
 -- acaba aqui
+
 function love.load()
 	mundo = {
 		largura = 1200,
@@ -375,7 +382,6 @@ love.keyboard.keysReleased = { }
 -- returns if specified key was pressed since the last update
 
 function love.keyboard.wasPressed(key)
-
 	if (love.keyboard.keysPressed[key]) then
 		return true
 	else
