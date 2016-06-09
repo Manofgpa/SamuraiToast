@@ -19,6 +19,10 @@ local function updateCameras(dt)
   cam:setAngle(cam:getAngle() + angleFactor * dt)]]
 end
 
+function gameReset()
+  hero.life = 250
+  end
+
 -- acaba aqui
 function love.load()
 	mundo = {
@@ -127,17 +131,10 @@ function love.load()
 	end
 	]]
 
-
-
-
 	timer= 0 
-
 	momento = os.time()
-
 	passado = 0 
-
 	intervalo = 3
-
 	count = 0 
 	points = 0 -- pontuacao do jogador 
 
@@ -146,25 +143,23 @@ function love.load()
 end
 
 function love.mousepressed(x,y)
-
-	if gamestate == "menu" or gamestate =="gameover"  then
-
+	if gamestate == "menu" or gamestate == "gameover"  then
 		button_click(x,y)
-
 	end
-
 end
 
 -------------------------------------------------------------------------
 
 function love.update(dt)
-
+  
 	if gamestate == "gameover" then
+    gameReset()
 		button_spawn(620,530,"Restart","restart")
 		button_spawn(50,530,"Quit","sair")
 		button_spawn(260,530,"Leaderboard","leaderboard")
+    button_draw()
 	end
-
+  
 	updateCameras(dt)
 	updateTarget(dt)
 
@@ -175,11 +170,9 @@ function love.update(dt)
 	mousex = love.mouse.getX()
 	mousey = love.mouse.getY()
 
-
 	if gamestate == "menu" or gamestate== "gameover"  then
 		button_check()
 	end
-
 
 	if gamestate == "jogando" then
 		button_clear()
@@ -187,11 +180,9 @@ function love.update(dt)
 		love.graphics.print("II",300,200)
 		momento = os.time() 
 
-
 		enemyGenerator()  
 
 		hero.shot = hero.shot - dt
-
 
 		if love.keyboard.isDown("right") then
 			hero.pos_x = hero.pos_x + (hero.velocidade * dt)
@@ -205,8 +196,6 @@ function love.update(dt)
 			end
 		end
 
-
-
 		if love.keyboard.isDown("left") then
 			hero.pos_x = hero.pos_x - (hero.velocidade * dt)
 			hero.anim_time = hero.anim_time + dt -- incrementa o tempo usando dt
@@ -218,8 +207,6 @@ function love.update(dt)
 				hero.anim_time = 0 -- reinicializa a contagem do tempo
 			end
 		end
-
-
 
 		if love.keyboard.isDown("down") then
 			hero.pos_y = hero.pos_y + (hero.velocidade * dt)
@@ -233,7 +220,6 @@ function love.update(dt)
 			end
 		end
 
-
 		if love.keyboard.isDown("up") then
 			hero.pos_y = hero.pos_y - (hero.velocidade * dt)
 			hero.anim_time = hero.anim_time + dt -- incrementa o tempo usando dt
@@ -245,8 +231,6 @@ function love.update(dt)
 				hero.anim_time = 0 -- reinicializa a contagem do tempo
 			end
 		end
-
-
 
 		local dist_x= 1 
 		local dist_y= 1
@@ -285,14 +269,12 @@ function love.update(dt)
 			if dist_y >= 0  then     
 				v.pos_y = v.pos_y + (80 *dt) 
 			end 
-		end 
-
+		end
 
 		for j,s in ipairs(shots) do  -- percorre todas instancias da tabela shots
 			s.pos_x = s.pos_x + s.dir_x * ( s.vel * dt ) 
 			s.pos_y = s.pos_y + s.dir_y * ( s.vel * dt ) 
 		end 
-
 
 		for j,s in ipairs(shots) do  -- checa colisao de inimigos com o shot 
 			for i,v in ipairs(enemy) do   
@@ -304,7 +286,6 @@ function love.update(dt)
 				end
 			end 
 		end 
-
 
 		for i,v in ipairs(enemy) do -- percorre tabela de inimigos checa cada um com o heroi 
 			if checkCol(hero.pos_x, hero.pos_y, hero.walk[hero.anim_frame]:getWidth()/2,hero.walk[hero.anim_frame]:getHeight()/2,
@@ -332,7 +313,6 @@ function love.update(dt)
 			power()
 		end 
 
-
 		for i,v in ipairs(powers) do -- percorre tabela de powers checa cada um com o heroi 
 			if checkCol(hero.pos_x, hero.pos_y, hero.walk[hero.anim_frame]:getWidth()/2,hero.walk[hero.anim_frame]:           getHeight()/2,v.pos_x, v.pos_y, v.img:getWidth()/2, v.img:getHeight()/2) then -- checando hero com powers  
 				if v.tipo == 1 then -- SE POWER 1 FOI PEGO 
@@ -348,7 +328,6 @@ function love.update(dt)
 			end
 		end 
 
-
 		if vel == true then  -- SE O POWER UP 3 FOI PEGO AUMNTA VELOCIDADE DO HEROI E DOS SHOTS 
 			hero.velocidade =  300
 			for i,v in ipairs(shots) do  
@@ -363,7 +342,6 @@ function love.update(dt)
 			end 
 		end 
 
-
 		for i,v in ipairs(powers) do 
 			v.time = v.time+ dt*10 
 			if( v.time > 1000) then 
@@ -371,20 +349,11 @@ function love.update(dt)
 			end 
 		end 
 
-
 	end 
 	if (love.keyboard.wasPressed("escape")) then
 		love.event.quit() --SAIR DO JOGO
-
 	end
-
 end 
-
-
-
-
-
-
 
 powers={} 
 function power()
@@ -400,7 +369,6 @@ function power()
 	table.insert(powers , {img = img , tipo = tipo , pos_x = love.math.random(0,1000) , pos_y= love.math.random(0,1000), time=0} )
 end 
 
-
 love.keyboard.keysPressed = { }
 love.keyboard.keysReleased = { }
 
@@ -409,61 +377,40 @@ love.keyboard.keysReleased = { }
 function love.keyboard.wasPressed(key)
 
 	if (love.keyboard.keysPressed[key]) then
-
 		return true
-
 	else
-
 		return false
-
 	end
-
 end
 
 -- returns if specified key was released since last update
 
 function love.keyboard.wasReleased(key)
-
 	if (love.keyboard.keysReleased[key]) then
-
 		return true
-
 	else
-
 		return false
-
 	end
-
 end
 
 -- concatenate this to existing love.keypressed callback, if any
 
 function love.keypressed(key, unicode)
-
 	love.keyboard.keysPressed[key] = true
-
 end
 
 -- concatenate this to existing love.keyreleased callback, if any
 
 function love.keyreleased(key)
-
 	love.keyboard.keysReleased[key] = true
-
 end
 
 -- call in end of each love.update to reset lists of pressed\released keys
 
 function love.keyboard.updateKeys()
-
 	love.keyboard.keysPressed = { }
-
 	love.keyboard.keysReleased = { }
-
 end
-
-
-
 
 hero= { 
 	anim_frame= 1 , 
@@ -478,36 +425,20 @@ hero= {
 	damage = 40 
 }
 
-
 local tilesetImage
 local tileQuads = {}
 local tileSize = 16
 
 function LoadTiles(filename, nx, ny)
-
 	tilesetImage = love.graphics.newImage(filename)
-
 	local count = 1
-
 	for i = 0, nx, 1 do
-
 		for j = 0, ny, 1 do
-
 			tileQuads[count] = love.graphics.newQuad(i * tileSize ,j * tileSize, tileSize, tileSize,tilesetImage:getWidth(), tilesetImage:getHeight())
-
-
-
-
 			count = count + 1
-
 		end
-
 	end
-
 end
-
-
-
 
 local mapa={} 
 
@@ -698,13 +629,10 @@ function love.draw()
 	love.graphics.setColor(255, 255, 255) 
 
 	if gamestate == "gameover" then
-		button_clear() 
 		love.graphics.setNewFont("fontes/fonteninja.ttf",90)
 		love.graphics.draw(telagameover,0,0)
 		love.graphics.print(gameover,150,20) 
 		button_draw()
-		love.graphics.print(gameover,150,100) 
-		button_draw() 
 	end
 
 	if gamestate == "menu" then
