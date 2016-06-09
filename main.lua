@@ -19,152 +19,96 @@ local function updateCameras(dt)
   cam:setAngle(cam:getAngle() + angleFactor * dt)]]
 end
 
+function gameReset()
+  hero.life = 250
+  hero.pos_x = 700
+  hero.pos_y = 700
+  points = 0
+  table.remove(shots)
+  table.remove(enemy)
+  table.remove(powers)
+  end
+
 -- acaba aqui
+
 function love.load()
 	mundo = {
 		largura = 1200,
 		altura = 1200
 	}
+  
 	telagameover = love.graphics.newImage("mapa/telagameover.jpg")
-
 	gameover = "Game Over"
+  
 	cam = gamera.new(0, 0,mundo.largura,mundo.altura)
 	cam:setWindow(0,0,800,600)
-
+  
 	horadoshow = love.audio.newSource("sons/horadoshow.mp3","stream")
 	gamesong = love.audio.newSource("sons/pandapo.mp3", "stream")
+  
 	shuriken = {
 		love.audio.newSource("sons/shuriken1.mp3", "stream") ,
 		love.audio.newSource("sons/shuriken2.mp3", "stream")
 	}
+  
 	enemy1 = love.audio.newSource("sons/die1.mp3", "stream") 
-	--[[tasaino = love.audio.newSource("tasaino.mp3","stream")
-
+	--tasaino = love.audio.newSource("tasaino.mp3","stream")
 	--grito = love.audio.newSource("grito.mp3","stream")
-
 	--comimuito = love.audio.newSource("comimuito.mp3","stream")
-
 	--boribilder = love.audio.newSource("boribilder.mp3","stream")
-
 	--biur = love.audio.newSource("biur.mp3","stream")
-
-	-- ajuda = love.audio.newSource("ajuda.mp3","stream")]]
-
+	--ajuda = love.audio.newSource("ajuda.mp3","stream")
 	nyan = love.audio.newSource("sons/nyan.mp3","stream")
-
-
-
-
-
-
-
 	samuraimenu = love.graphics.newImage ("menu/samuraimenu.png")
-
 	fonte = love.graphics.newFont("fontes/fonteninja.ttf",40)
-
--- love.window.setFullscreen(true) -- FULLSCREEN
-
 	gamestate = "menu"
-
 	menu = love.graphics.newImage("menu/backgroundi.png")
 
-
-
-
-
-
-
-
-
-
 	LoadMap("mapa/mapa.txt") -- chama funcao Load Map que carrega mapa do jogo vindo do arquivo txt
-
 	LoadTiles("mapa/sheet.png",13,8)
-
-
-
-
-
-
-
-
-
 
 	for x = 1, 12, 1 do -- carrega instancia "walk" da tabela "hero" com imagens da caminhada do heroi
 		hero.walk[x] = love.graphics.newImage("hero/hero0" .. x .. ".png")
 	end
 
-
-
-
-	timer= 0 
-
-
-
-
-
-
-
---butoes jogo
-
-
+-- Butoes
 
 	if gamestate == "menu" then
 		button_spawn(390,300,"Start","start")
 		button_spawn(10,550,"Quit","sair")
 	end
 
-
 	if gamestate == "jogando" then
 		button_spawn(400,22,"Pause","pause")
 	end
 
-	--[[if gamestate == "gameover" then
-    button_spawn(620,530,"Restart","restart")
-    button_spawn(50,530,"Quit","sair")
-    button_spawn(260,530,"Leaderboard","leaderboard")
-  if gamestate == "gameover" then
-	end
-	]]
-
-
-
-
 	timer= 0 
-
 	momento = os.time()
-
 	passado = 0 
-
 	intervalo = 3
-
 	count = 0 
 	points = 0 -- pontuacao do jogador 
-
-
-
+  
 end
 
 function love.mousepressed(x,y)
-
-	if gamestate == "menu" or gamestate =="gameover"  then
-
+	if gamestate == "menu" or gamestate == "gameover"  then
 		button_click(x,y)
-
 	end
-
 end
 
 -------------------------------------------------------------------------
 
 function love.update(dt)
-
+  
 	if gamestate == "gameover" then
+    gameReset()
 		button_spawn(620,530,"Restart","restart")
 		button_spawn(50,530,"Quit","sair")
 		button_spawn(260,530,"Leaderboard","leaderboard")
+    button_draw()
 	end
-
+  
 	updateCameras(dt)
 	updateTarget(dt)
 
@@ -175,11 +119,9 @@ function love.update(dt)
 	mousex = love.mouse.getX()
 	mousey = love.mouse.getY()
 
-
 	if gamestate == "menu" or gamestate== "gameover"  then
 		button_check()
 	end
-
 
 	if gamestate == "jogando" then
 		button_clear()
@@ -187,11 +129,9 @@ function love.update(dt)
 		love.graphics.print("II",300,200)
 		momento = os.time() 
 
-
 		enemyGenerator()  
 
 		hero.shot = hero.shot - dt
-
 
 		if love.keyboard.isDown("right") then
 			hero.pos_x = hero.pos_x + (hero.velocidade * dt)
@@ -205,8 +145,6 @@ function love.update(dt)
 			end
 		end
 
-
-
 		if love.keyboard.isDown("left") then
 			hero.pos_x = hero.pos_x - (hero.velocidade * dt)
 			hero.anim_time = hero.anim_time + dt -- incrementa o tempo usando dt
@@ -218,8 +156,6 @@ function love.update(dt)
 				hero.anim_time = 0 -- reinicializa a contagem do tempo
 			end
 		end
-
-
 
 		if love.keyboard.isDown("down") then
 			hero.pos_y = hero.pos_y + (hero.velocidade * dt)
@@ -233,7 +169,6 @@ function love.update(dt)
 			end
 		end
 
-
 		if love.keyboard.isDown("up") then
 			hero.pos_y = hero.pos_y - (hero.velocidade * dt)
 			hero.anim_time = hero.anim_time + dt -- incrementa o tempo usando dt
@@ -245,8 +180,6 @@ function love.update(dt)
 				hero.anim_time = 0 -- reinicializa a contagem do tempo
 			end
 		end
-
-
 
 		local dist_x= 1 
 		local dist_y= 1
@@ -285,14 +218,12 @@ function love.update(dt)
 			if dist_y >= 0  then     
 				v.pos_y = v.pos_y + (80 *dt) 
 			end 
-		end 
-
+		end
 
 		for j,s in ipairs(shots) do  -- percorre todas instancias da tabela shots
 			s.pos_x = s.pos_x + s.dir_x * ( s.vel * dt ) 
 			s.pos_y = s.pos_y + s.dir_y * ( s.vel * dt ) 
 		end 
-
 
 		for j,s in ipairs(shots) do  -- checa colisao de inimigos com o shot 
 			for i,v in ipairs(enemy) do   
@@ -304,7 +235,6 @@ function love.update(dt)
 				end
 			end 
 		end 
-
 
 		for i,v in ipairs(enemy) do -- percorre tabela de inimigos checa cada um com o heroi 
 			if checkCol(hero.pos_x, hero.pos_y, hero.walk[hero.anim_frame]:getWidth()/2,hero.walk[hero.anim_frame]:getHeight()/2,
@@ -332,7 +262,6 @@ function love.update(dt)
 			power()
 		end 
 
-
 		for i,v in ipairs(powers) do -- percorre tabela de powers checa cada um com o heroi 
 			if checkCol(hero.pos_x, hero.pos_y, hero.walk[hero.anim_frame]:getWidth()/2,hero.walk[hero.anim_frame]:           getHeight()/2,v.pos_x, v.pos_y, v.img:getWidth()/2, v.img:getHeight()/2) then -- checando hero com powers  
 				if v.tipo == 1 then -- SE POWER 1 FOI PEGO 
@@ -348,7 +277,6 @@ function love.update(dt)
 			end
 		end 
 
-
 		if vel == true then  -- SE O POWER UP 3 FOI PEGO AUMNTA VELOCIDADE DO HEROI E DOS SHOTS 
 			hero.velocidade =  300
 			for i,v in ipairs(shots) do  
@@ -361,7 +289,11 @@ function love.update(dt)
 				end 
 				vel = false 
 			end 
+<<<<<<< HEAD
 		end
+=======
+		end 
+>>>>>>> origin/master
 
 		for i,v in ipairs(powers) do 
 			v.time = v.time+ dt*10 
@@ -369,6 +301,10 @@ function love.update(dt)
 				table.remove(powers ,i ) 
 			end 
 		end 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
 	end 
 
 	if (love.keyboard.wasPressed("escape")) then
@@ -376,8 +312,12 @@ function love.update(dt)
 	end
 end 
 
+<<<<<<< HEAD
 powers={}
 
+=======
+powers={} 
+>>>>>>> origin/master
 function power()
 	tipo = love.math.random(1,3) -- 3 tipos de power ups 
 
@@ -397,63 +337,41 @@ love.keyboard.keysReleased = { }
 -- returns if specified key was pressed since the last update
 
 function love.keyboard.wasPressed(key)
-
 	if (love.keyboard.keysPressed[key]) then
-
 		return true
-
 	else
-
 		return false
-
 	end
-
 end
 
 -- returns if specified key was released since last update
 
 function love.keyboard.wasReleased(key)
-
 	if (love.keyboard.keysReleased[key]) then
-
 		return true
-
 	else
-
 		return false
-
 	end
-
 end
 
 -- concatenate this to existing love.keypressed callback, if any
 
 function love.keypressed(key, unicode)
-
 	love.keyboard.keysPressed[key] = true
-
 end
 
 -- concatenate this to existing love.keyreleased callback, if any
 
 function love.keyreleased(key)
-
 	love.keyboard.keysReleased[key] = true
-
 end
 
 -- call in end of each love.update to reset lists of pressed\released keys
 
 function love.keyboard.updateKeys()
-
 	love.keyboard.keysPressed = { }
-
 	love.keyboard.keysReleased = { }
-
 end
-
-
-
 
 hero= { 
 	anim_frame= 1 , 
@@ -468,36 +386,20 @@ hero= {
 	damage = 40 
 }
 
-
 local tilesetImage
 local tileQuads = {}
 local tileSize = 16
 
 function LoadTiles(filename, nx, ny)
-
 	tilesetImage = love.graphics.newImage(filename)
-
 	local count = 1
-
 	for i = 0, nx, 1 do
-
 		for j = 0, ny, 1 do
-
 			tileQuads[count] = love.graphics.newQuad(i * tileSize ,j * tileSize, tileSize, tileSize,tilesetImage:getWidth(), tilesetImage:getHeight())
-
-
-
-
 			count = count + 1
-
 		end
-
 	end
-
 end
-
-
-
 
 local mapa={} 
 
@@ -539,7 +441,6 @@ function enemy.spawn() --insert elements on enemy table
 		end 
 	end 
 
-
 	table.insert(enemy, {pos_x=x, pos_y=y, tipo=tipo, anim_time=0, img={}, frame=1}) -- cria nova instancia de enemy 
 
 	for i, v in ipairs(enemy) do --carrega imagens de acordo com o tipo de inimigo 
@@ -552,9 +453,7 @@ function enemy.spawn() --insert elements on enemy table
 			v.img[2] = love.graphics.newImage("enemies/kopa2.png")
 		end 
 	end 
-end 
-
-
+end
 
 function enemyGenerator() 
 	momento = os.time() 
@@ -573,8 +472,6 @@ function enemyGenerator()
 	end 
 end 
 
-
-
 shots = {}  -- table with all shurikens 
 
 function shoot(x, y , dirx, diry) -- makes shuriken appear on the screen from pont where hero faces
@@ -587,20 +484,9 @@ function checkCol( x1, y1, w1,h1, x2,y2,w2,h2)
 	return x1 < x2+w2 and x2 < x1+w1 and y1 < y2+h2 and y2 < y1+h1
 end 
 
-
-
-
 -------------------------------------------------------------------------
 
-
-
-
---------------------------------------------------------------------------------------------------
-
 function love.draw()
-
-	-- camera:set()
-
 
 	cam:draw(function(l,t,w,h)
 
@@ -621,20 +507,13 @@ function love.draw()
 					end
 				end
 
-
-
 				love.graphics.setColor(255, 255, 255) 
 				love.graphics.draw(hero.walk[hero.anim_frame], hero.pos_x ,  -- desenha heroi
 					hero.pos_y, 0, 0.85,0.85, hero.walk[hero.anim_frame]:getWidth()/2, hero.walk[hero.anim_frame]:getHeight()/2 )
 
-
-
 				for i,v in ipairs(enemy) do
 					love.graphics.draw( v.img[v.frame] , v.pos_x, v.pos_y)   -- draws enemies onscreen 
 				end
-
-
-
 
 				local dir_y= 0  -- control shuriken aiming through hero frame
 				local dir_x= 1 
@@ -658,19 +537,16 @@ function love.draw()
 					hero.shot = hero.cooldown
 				end 
 
-
 				for i, v in pairs(shots) do 
 					love.graphics.draw( v.img, v.pos_x, v.pos_y, (v.pos_x + v.pos_y)*1/2 , 1.3 ,1.3 , v.img:getWidth()/2, v.img:getHeight()/2 )  -- desenha shots    
 					love.keyboard.updateKeys()
 				end 
-
 
 				for i, v in pairs(powers) do  -- desenha power ups  
 					love.graphics.draw( v.img, v.pos_x, v.pos_y, 0 , 1 ,1, v.img:getWidth()/2, v.img:getHeight()/2 )   
 				end 
 				love.graphics.setColor(255,255,255)
 				love.graphics.setFont(fonte,50)
-
 			end 
 		end)
 
@@ -699,6 +575,4 @@ function love.draw()
 		love.graphics.draw(samuraimenu,140,100)
 		button_draw()
 	end
-
-
 end 
