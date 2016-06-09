@@ -1,6 +1,5 @@
 require "menu"
---require "camera"
-
+local utf8 = require("utf8")
 local gamera = require "gamera"
 local isDown = love.keyboard.isDown
 local min, max = math.min, math.max
@@ -20,37 +19,52 @@ local function updateCameras(dt)
 end
 
 function gameReset()
-  hero.life = 250
-  hero.pos_x = 700
-  hero.pos_y = 700
-  points = 0
-  table.remove(shots)
-  table.remove(enemy)
-  table.remove(powers)
-  end
+	hero.life = 250
+	hero.pos_x = 700
+	hero.pos_y = 700
+	hero.score = 0
+	table.remove(shots)
+	table.remove(enemy)
+	table.remove(powers)
+end
 
 -- acaba aqui
 
 function love.load()
+
+	highscores = {}
+
+	if not love.filesystem.exists("score.lua")then
+		score = love.filesystem.newFile("score.lua")
+	end
+
+	love.filesystem.write("score.lua","hero.highscore\n=\n" .. hero.highscore)
+
+	for lines in love.filesystem.lines("score.lua") do
+		table.insert(highscores,lines)
+	end
+
+	hero.highscore = highscores[3]
+
 	mundo = {
 		largura = 1200,
 		altura = 1200
 	}
-  
+
 	telagameover = love.graphics.newImage("mapa/telagameover.jpg")
 	gameover = "Game Over"
-  
+
 	cam = gamera.new(0, 0,mundo.largura,mundo.altura)
 	cam:setWindow(0,0,800,600)
-  
+
 	horadoshow = love.audio.newSource("sons/horadoshow.mp3","stream")
 	gamesong = love.audio.newSource("sons/pandapo.mp3", "stream")
-  
+
 	shuriken = {
 		love.audio.newSource("sons/shuriken1.mp3", "stream") ,
 		love.audio.newSource("sons/shuriken2.mp3", "stream")
 	}
-  
+
 	enemy1 = love.audio.newSource("sons/die1.mp3", "stream") 
 	--tasaino = love.audio.newSource("tasaino.mp3","stream")
 	--grito = love.audio.newSource("grito.mp3","stream")
@@ -87,8 +101,7 @@ function love.load()
 	passado = 0 
 	intervalo = 3
 	count = 0 
-	points = 0 -- pontuacao do jogador 
-  
+
 end
 
 function love.mousepressed(x,y)
@@ -100,19 +113,33 @@ end
 -------------------------------------------------------------------------
 
 function love.update(dt)
-  
+
+	if hero.score > tonumber (hero.highscore) then
+		hero.highscore = hero.score
+	end
+
+
+	if love.keyboard.isDown("backspace") then
+		local byteoffset = utf8.offset(hero.name, -1)
+		if byteoffset then
+			hero.name = string.sub(hero.name, 1, byteoffset - 1)
+		end
+	end
+
 	if gamestate == "gameover" then
-    gameReset()
+		gameReset()
 		button_spawn(620,530,"Restart","restart")
 		button_spawn(50,530,"Quit","sair")
 		button_spawn(260,530,"Leaderboard","leaderboard")
-    button_draw()
+
+		button_draw()
 	end
-  
+
 	updateCameras(dt)
 	updateTarget(dt)
 
 	if hero.life < 1 then
+		love.filesystem.write("score.lua", "hero.highscore\n=\n" .. hero.highscore)
 		gamestate = "gameover"
 	end
 
@@ -230,7 +257,7 @@ function love.update(dt)
 				if  checkCol(s.pos_x, s.pos_y, s.img:getWidth()/2, s.img:getHeight()/2, v.pos_x, v.pos_y, v.img[1]:getWidth()/2, v.img[1]:getHeight()/2)  then -- checando shots com inimigos 
 					table.remove(enemy, i)
 					love.audio.play(enemy1)
-					points = points + 1 
+					hero.score = hero.score + 1 
 					table.remove(shots, j)
 				end
 			end 
@@ -288,36 +315,25 @@ function love.update(dt)
 					v.vel = 230 
 				end 
 				vel = false 
-			end 
-<<<<<<< HEAD
+			end
 		end
-=======
-		end 
->>>>>>> origin/master
-
-		for i,v in ipairs(powers) do 
-			v.time = v.time+ dt*10 
-			if( v.time > 1000) then 
-				table.remove(powers ,i ) 
-			end 
-		end 
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/master
+	else 
+		love.audio.pause(gamesong)
 	end 
 
-	if (love.keyboard.wasPressed("escape")) then
-		love.event.quit() --SAIR DO JOGO
-	end
+
+	for i,v in ipairs(powers) do 
+		v.time = v.time+ dt*10 
+		if( v.time > 1000) then 
+			table.remove(powers ,i ) 
+		end 
+	end 
 end 
 
-<<<<<<< HEAD
-powers={}
 
-=======
+
 powers={} 
->>>>>>> origin/master
+
 function power()
 	tipo = love.math.random(1,3) -- 3 tipos de power ups 
 
@@ -383,8 +399,22 @@ hero= {
 	cooldown = 0.2,
 	shot = 0,
 	life = 250, 
+	name = "",
+	nameinput = "on",
+	score = 0,
+	highscore = 0,
 	damage = 40 
 }
+
+function love.textinput(t)
+
+	if hero.nameinput == "on" then
+		hero.name = hero.name .. t
+	end
+	if hero.nameinput == "off" then
+		hero.name = hero.name
+	end
+end
 
 local tilesetImage
 local tileQuads = {}
@@ -551,6 +581,7 @@ function love.draw()
 		end)
 
 	if gamestate == "jogando" then
+		love.graphics.print(hero.name, 350,20)
 		if vel == true then 
 			love.graphics.setColor(0,100,0)
 		else 
@@ -558,7 +589,7 @@ function love.draw()
 		end 
 		love.graphics.rectangle("fill", 10, 15, hero.life ,15) -- desenha barra de vida 
 		love.graphics.setColor(255,255,255)
-		love.graphics.print(points, 700, 10 ) 
+		love.graphics.print(hero.score, 700, 10 ) 
 	end
 
 	love.graphics.setColor(255, 255, 255) 
@@ -568,11 +599,30 @@ function love.draw()
 		love.graphics.draw(telagameover,0,0)
 		love.graphics.print(gameover,150,20) 
 		button_draw()
+
+	end
+
+	function love.keypressed(key)
+		if love.keyboard.isDown("return") then 
+			hero.nameinput = "off"
+		end
+		if love.keyboard.isDown("escape") and hero.nameinput == "off" then
+			love.event.quit()
+		end
+		if love.keyboard.isDown('n') and hero.nameinput == "off" then
+			hero.nameinput = "on"
+		end
 	end
 
 	if gamestate == "menu" then
 		love.graphics.draw(menu,0,0,ox,1.35)
-		love.graphics.draw(samuraimenu,140,100)
+		love.graphics.draw(samuraimenu,140,50)
 		button_draw()
+		love.graphics.setColor(0,0,0)
+		love.graphics.rectangle("fill",190,200,500,80)
+		love.graphics.setColor(242,126,24)
+		love.graphics.print("De um nome para a sua torrada bambam!",5,150)
+		love.graphics.setColor(31,242,24)
+		love.graphics.printf(hero.name, 0, 220,875, "center")
 	end
 end 
