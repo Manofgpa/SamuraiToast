@@ -326,7 +326,7 @@ for i,v in ipairs(powers) do -- percorre tabela de powers checa cada um com o he
 
 
 
-   if hero.score%2==0 and hero.score>0 then 
+   if hero.score%2 == 0 and hero.score > 0 then 
      boss.on = true 
      end 
 	end 
