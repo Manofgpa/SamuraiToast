@@ -1,13 +1,13 @@
-require "menu"
-local utf8 = require("utf8")
+local menu = require "menu"
+local utf8 = require "utf8"
 local gamera = require "gamera"
+local scoreslib = require "scoreslib"
 local isDown = love.keyboard.isDown
 local min, max = math.min, math.max
 
 local function updateTarget(dt)
 	enemy.pos_x, enemy.pos_y = cam:toWorld(love.mouse.getPosition())
 end
-
 
 local function updateCameras(dt)
 	cam:setPosition(hero.pos_x, hero.pos_y)
@@ -28,24 +28,27 @@ function gameReset()
 	table.remove(powers)
 end
 
--- acaba aqui
 
 function love.load()
-
-	highscores = {}
-
-	if not love.filesystem.exists("score.lua")then
-		score = love.filesystem.newFile("score.lua")
-	end
-
-	love.filesystem.write("score.lua","hero.highscore\n=\n" .. hero.highscore)
-
-	for lines in love.filesystem.lines("score.lua") do
-		table.insert(highscores,lines)
-	end
-
-	hero.highscore = highscores[3]
-
+  
+  boss1 = love.graphics.newImage("enemies/boss1.png")
+  boss2 = love.graphics.newImage("enemies/boss2.png")
+  
+  boss = { 
+  life = 100 ,
+  velocidade = 50 ,
+  frame = 1 ,
+  on = false ,  
+  anim_time = 0 ,
+  pos_y = 200,
+  pos_x = 300 ,
+  shoot_time 
+  }
+  
+  
+  
+  highscore.set("highscores.txt",5)
+  
 	mundo = {
 		largura = 1200,
 		altura = 1200
@@ -114,11 +117,6 @@ end
 
 function love.update(dt)
 
-	if hero.score > tonumber (hero.highscore) then
-		hero.highscore = hero.score
-	end
-
-
 	if love.keyboard.isDown("backspace") then
 		local byteoffset = utf8.offset(hero.name, -1)
 		if byteoffset then
@@ -138,10 +136,6 @@ function love.update(dt)
 	updateCameras(dt)
 	updateTarget(dt)
 
-	if hero.life < 1 then
-		love.filesystem.write("score.lua", "hero.highscore\n=\n" .. hero.highscore)
-		gamestate = "gameover"
-	end
 
 	mousex = love.mouse.getX()
 	mousey = love.mouse.getY()
@@ -283,11 +277,82 @@ function love.update(dt)
 			end 
 		end 
 
-		timer = timer + 1
+    timer = timer + 1
 		--ALGORITMO DE RANDOM PARA GERAR POWER UPS ***MODIFICAR***
-		if  timer%25 == 0 then 
-			power()
+		if  timer%50 == 0 then 
+      if love.math.random(1,2) == 2 then 
+        power()
+      end 
+    end 
+
+
+for i,v in ipairs(powers) do -- percorre tabela de powers checa cada um com o heroi 
+			if checkCol(hero.pos_x, hero.pos_y, hero.walk[hero.anim_frame]:getWidth()/2,hero.walk[hero.anim_frame]:getHeight()/2,v.pos_x, v.pos_y, v.img:getWidth()/2, v.img:getHeight()/2) then -- checando hero com powers  
+				if v.tipo == 1 then -- SE POWER 1 FOI PEGO 
+				elseif v.tipo == 2 then  -- SE POWER 2 FOI PEGO AUMENTA A VIDA 
+					if hero.life < 400 then
+						hero.life = hero.life + 50
+					end 
+				else   -- SE POWER 3 FOI PEGO VARIAVEL VEL EH VERDADEIRA 
+					run = timer
+					vel = true 
+				end 
+				table.remove(powers, i ) 
+			end
 		end 
+
+
+		if vel == true then  -- SE O POWER UP 3 FOI PEGO AUMNTA VELOCIDADE DO HEROI E DOS SHOTS 
+			hero.velocidade =  300
+			for i,v in ipairs(shots) do  
+				v.vel = 390 
+			end 
+			if (timer - run > 300) then 
+				hero.velocidade = 120 
+				for i,v in ipairs(shots) do  
+					v.vel = 230 
+				end 
+				vel = false 
+			end 
+		end 
+
+
+		for i,v in ipairs(powers) do 
+			v.time = v.time+ dt*10 
+			if( v.time > 1000) then 
+				table.remove(powers ,i ) 
+			end 
+		end 
+
+
+
+   if hero.score%2==0 and hero.score>0 then 
+     boss.on = true 
+     end 
+	end 
+  
+  dist_x= 1 
+  dist_y= 1 
+  
+   if boss.on == true then 
+      dist_x= hero.pos_x - boss.pos_x    -- faz inimigo perseguir o heroi checando pos heroi e do inimigo 
+			dist_y= hero.pos_y - boss.pos_y
+			if dist_x <= 0 then
+				boss.pos_x = boss.pos_x - (boss.velocidade *dt) 
+			end 
+			if dist_y  <= 0  then 
+				boss.pos_y = boss.pos_y - (boss.velocidade *dt) 
+			end 
+			if dist_x >= 0  then     
+				boss.pos_x = boss.pos_x + (boss.velocidade *dt) 
+			end
+			if dist_y >= 0  then     
+				boss.pos_y = boss.pos_y + (boss.velocidade *dt) 
+			end 
+      
+      
+      
+      end 
 
 		for i,v in ipairs(powers) do -- percorre tabela de powers checa cada um com o heroi 
 			if checkCol(hero.pos_x, hero.pos_y, hero.walk[hero.anim_frame]:getWidth()/2,hero.walk[hero.anim_frame]:           getHeight()/2,v.pos_x, v.pos_y, v.img:getWidth()/2, v.img:getHeight()/2) then -- checando hero com powers  
@@ -316,11 +381,9 @@ function love.update(dt)
 				end 
 				vel = false 
 			end
-		end
 	else 
 		love.audio.pause(gamesong)
-	end 
-
+	end
 
 	for i,v in ipairs(powers) do 
 		v.time = v.time+ dt*10 
@@ -328,9 +391,13 @@ function love.update(dt)
 			table.remove(powers ,i ) 
 		end 
 	end 
+  
+  	if hero.life < 1 then
+    highscore.add(hero.name,hero.score)
+    highscore.save()
+		gamestate = "gameover"
+	end
 end 
-
-
 
 powers={} 
 
@@ -402,7 +469,6 @@ hero= {
 	name = "",
 	nameinput = "on",
 	score = 0,
-	highscore = 0,
 	damage = 40 
 }
 
@@ -517,6 +583,10 @@ end
 -------------------------------------------------------------------------
 
 function love.draw()
+  
+  if boss.on == true then 
+    love.graphics.draw(--[[boss.walk[boss.frame]]boss1,boss.pos_y, boss.pos_x, 0, 1, 1 ,--[[boss.walk[boss.frame]]boss1:getWidth()/2, --[[boss.walk[boss.frame]]boss1:getHeight()/2)
+    end 
 
 	cam:draw(function(l,t,w,h)
 
