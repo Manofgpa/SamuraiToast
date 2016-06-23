@@ -291,21 +291,30 @@ function love.update(dt)
 
     for i,v in ipairs(powers) do -- percorre tabela de powers checa cada um com o heroi 
       if checkCol(hero.pos_x, hero.pos_y, hero.walk[hero.anim_frame]:getWidth()/2,hero.walk[hero.anim_frame]:getHeight()/2,v.pos_x, v.pos_y, v.img:getWidth()/2, v.img:getHeight()/2) then -- checando hero com powers  
-        if v.tipo == 1 then -- SE POWER 1 FOI PEGO 
+        if v.tipo == 1 then -- SE POWER 1 FOI PEGO (de forca) 
+          force = true 
+          force_timer = timer 
         elseif v.tipo == 2 then  -- SE POWER 2 FOI PEGO AUMENTA A VIDA 
           if hero.life < 400 then
             hero.life = hero.life + 50
           end 
-        else   -- SE POWER 3 FOI PEGO VARIAVEL VEL EH VERDADEIRA 
+        else   -- SE POWER 3 FOI PEGO(de velocidade) 
           run = timer
           vel = true 
         end 
         table.remove(powers, i ) 
       end
     end 
+  
+   if force == true then -- TEMPO DE DURACAO DO POWER UP 1 (forca) 
+     hero.damage = 10 
+     if (timer - force_timer > 300) then 
+        hero.damage = 40 
+        force = false 
+      end 
+   end 
 
-
-    if vel == true then  -- SE O POWER UP 3 FOI PEGO AUMNTA VELOCIDADE DO HEROI E DOS SHOTS 
+    if vel == true then  -- TEMPO DE DURACAO DO POWER UP 3 (velocidadee) 
       hero.velocidade =  300
       for i,v in ipairs(shots) do  
         v.vel = 390 
@@ -320,7 +329,7 @@ function love.update(dt)
     end 
 
 
-    for i,v in ipairs(powers) do 
+    for i,v in ipairs(powers) do -- retira power ups que nao foram pegos da tela 
       v.time = v.time+ dt*10 
       if( v.time > 1000) then 
         table.remove(powers ,i ) 
@@ -329,7 +338,7 @@ function love.update(dt)
 
 
 
-    if hero.score%2 == 0 and hero.score > 0 then 
+    if hero.score%2==0 and hero.score>0 then 
       boss.on = true 
     end 
   end 
@@ -360,6 +369,7 @@ function love.update(dt)
   for i,v in ipairs(powers) do -- percorre tabela de powers checa cada um com o heroi 
     if checkCol(hero.pos_x, hero.pos_y, hero.walk[hero.anim_frame]:getWidth()/2,hero.walk[hero.anim_frame]:           getHeight()/2,v.pos_x, v.pos_y, v.img:getWidth()/2, v.img:getHeight()/2) then -- checando hero com powers  
       if v.tipo == 1 then -- SE POWER 1 FOI PEGO 
+        force = true 
       elseif v.tipo == 2 then  -- SE POWER 2 FOI PEGO AUMENTA A VIDA 
         if hero.life < 400 then
           hero.life = hero.life + 50
@@ -464,7 +474,7 @@ hero= {
   walk = {} ,
   pos_x = 700  , 
   pos_y= 700  , 
-  velocidade = 120  ,
+  velocidade = 160  ,
   anim_time=0, 
   cooldown = 0.2,
   shot = 0,
@@ -632,10 +642,10 @@ function love.draw()
           if hero.anim_frame <= 4   then -- Left 
             dir_x= 1 
             dir_y= 0 
-          end
+           end 
           if hero.anim_frame>=5 and hero.anim_frame <= 8   then -- Righ 
-            dir_x= -1 
-          end
+            dir_x= -1   
+            end     
           shoot(hero.pos_x, hero.pos_y, dir_x , dir_y ) 
           hero.shot = hero.cooldown
         end 
@@ -665,6 +675,15 @@ function love.draw()
     love.graphics.print(hero.score, 700, 10 ) 
   end
 
+    if force == true then 
+    love.graphics.setColor(0,0,255)
+    love.graphics.rectangle("fill", 10, 85, 300+(force_timer-timer) ,15)
+    end 
+  love.graphics.setColor(255, 255, 255) 
+  if vel == true then 
+    love.graphics.setColor(255,255,0)
+    love.graphics.rectangle("fill", 10, 65, 300+(run-timer) ,15)
+    end 
   love.graphics.setColor(255, 255, 255) 
 
   if gamestate == "gameover" then
