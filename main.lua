@@ -23,6 +23,7 @@ function gameReset()
   hero.pos_x = 700
   hero.pos_y = 700
   hero.score = 0
+  hero.velocidade = 160
   table.remove(shots)
   table.remove(enemy)
   table.remove(powers)
@@ -30,7 +31,9 @@ end
 
 
 function love.load()
-
+  pausado = love.graphics.newImage("menu/paused.png")
+  pause = love.graphics.newImage("menu/pause.jpg")
+  leaderboard = love.graphics.newImage("menu/leaderboard.png")
   boss1 = love.graphics.newImage("enemies/boss1.png")
   boss2 = love.graphics.newImage("enemies/boss2.png")
 
@@ -47,7 +50,7 @@ function love.load()
 
 
 
-  highscore.set("highscores.txt",5)
+  scoreslib.loadHighscores("highscores.txt",5)
 
   mundo = {
     largura = 1200,
@@ -95,10 +98,6 @@ function love.load()
     button_spawn(10,550,"Quit","sair")
   end
 
-  if gamestate == "jogando" then
-    button_spawn(400,22,"Pause","pause")
-  end
-
   timer= 0 
   momento = os.time()
   passado = 0 
@@ -108,14 +107,27 @@ function love.load()
 end
 
 function love.mousepressed(x,y)
-  if gamestate == "menu" or gamestate == "gameover"  then
+  if gamestate == "menu" or gamestate == "gameover" or gamestate == "leaderboard" or gamestate == "jogando" or gamestate == "pause" then
     button_click(x,y)
   end
 end
 
--------------------------------------------------------------------------
 
 function love.update(dt)
+
+  if gamestate == "pause" then
+    button_clear()
+    button_spawn(50,200,"Resume","resume")
+    button_spawn(300,500,"Menu","menu")
+  end 
+
+
+  if gamestate == "leaderboard" then
+    button_clear()
+    button_spawn(620,530,"Restart","restart")
+    button_spawn(50,530,"Quit","sair")
+    button_draw()
+  end
 
   if love.keyboard.isDown("backspace") then
     local byteoffset = utf8.offset(hero.name, -1)
@@ -140,7 +152,7 @@ function love.update(dt)
   mousex = love.mouse.getX()
   mousey = love.mouse.getY()
 
-  if gamestate == "menu" or gamestate== "gameover"  then
+  if gamestate == "menu" or gamestate== "gameover" then
     if love.keyboard.isDown("return") then
       gamestate = "jogando"
     end 
@@ -150,7 +162,7 @@ function love.update(dt)
   if gamestate == "jogando" then
     button_clear()
     love.audio.play(gamesong , { channel=0, loops=-1, fadein=5000 } )
-    love.graphics.print("II",300,200)
+    button_spawn(650,100,"PAUSE","pause")
     momento = os.time() 
 
     enemyGenerator()  
@@ -288,6 +300,14 @@ function love.update(dt)
       end 
     end 
 
+    if hero.name == "mano" or hero.name == "MANO" then
+      hero.life = 9999
+      hero.velocidade = 2000
+      hero.score = 999999
+      hero.cooldown = 0.01
+    end
+
+
 
     for i,v in ipairs(powers) do -- percorre tabela de powers checa cada um com o heroi 
       if checkCol(hero.pos_x, hero.pos_y, hero.walk[hero.anim_frame]:getWidth()/2,hero.walk[hero.anim_frame]:getHeight()/2,v.pos_x, v.pos_y, v.img:getWidth()/2, v.img:getHeight()/2) then -- checando hero com powers  
@@ -305,14 +325,14 @@ function love.update(dt)
         table.remove(powers, i ) 
       end
     end 
-  
-   if force == true then -- TEMPO DE DURACAO DO POWER UP 1 (forca) 
-     hero.damage = 10 
-     if (timer - force_timer > 300) then 
+
+    if force == true then -- TEMPO DE DURACAO DO POWER UP 1 (forca) 
+      hero.damage = 10 
+      if (timer - force_timer > 300) then 
         hero.damage = 40 
         force = false 
       end 
-   end 
+    end 
 
     if vel == true then  -- TEMPO DE DURACAO DO POWER UP 3 (velocidadee) 
       hero.velocidade =  300
@@ -406,8 +426,8 @@ function love.update(dt)
   end 
 
   if hero.life < 1 then
-    highscore.add(hero.name,hero.score)
-    highscore.save()
+    scoreslib.addHighscore(hero.name,hero.score)
+    scoreslib.saveHighscores("highscores.txt")
     gamestate = "gameover"
   end
 end 
@@ -476,7 +496,7 @@ hero= {
   pos_y= 700  , 
   velocidade = 160  ,
   anim_time=0, 
-  cooldown = 0.2,
+  cooldown = 0.4,
   shot = 0,
   life = 250, 
   name = "",
@@ -597,6 +617,12 @@ end
 
 function love.draw()
 
+
+  if gamestate == "pause" then
+   
+    love.graphics.print("PAUSADO",100,110)
+  end
+
   if boss.on == true then 
     love.graphics.draw(--[[boss.walk[boss.frame]]boss1,boss.pos_y, boss.pos_x, 0, 1, 1 ,--[[boss.walk[boss.frame]]boss1:getWidth()/2, --[[boss.walk[boss.frame]]boss1:getHeight()/2)
   end 
@@ -642,10 +668,10 @@ function love.draw()
           if hero.anim_frame <= 4   then -- Left 
             dir_x= 1 
             dir_y= 0 
-           end 
+          end 
           if hero.anim_frame>=5 and hero.anim_frame <= 8   then -- Righ 
             dir_x= -1   
-            end     
+          end     
           shoot(hero.pos_x, hero.pos_y, dir_x , dir_y ) 
           hero.shot = hero.cooldown
         end 
@@ -664,6 +690,7 @@ function love.draw()
     end)
 
   if gamestate == "jogando" then
+    button_draw()
     love.graphics.print(hero.name, 350,20)
     if vel == true then 
       love.graphics.setColor(0,100,0)
@@ -675,21 +702,21 @@ function love.draw()
     love.graphics.print(hero.score, 700, 10 ) 
   end
 
-    if force == true then 
+  if force == true then 
     love.graphics.setColor(0,0,255)
     love.graphics.rectangle("fill", 10, 85, 300+(force_timer-timer) ,15)
-    end 
+  end 
   love.graphics.setColor(255, 255, 255) 
   if vel == true then 
     love.graphics.setColor(255,255,0)
     love.graphics.rectangle("fill", 10, 65, 300+(run-timer) ,15)
-    end 
+  end 
   love.graphics.setColor(255, 255, 255) 
 
   if gamestate == "gameover" then
     love.graphics.setNewFont("fontes/fonteninja.ttf",90)
     love.graphics.draw(telagameover,0,0)
-    love.graphics.print(gameover,150,20) 
+    love.graphics.print(gameover,150,20)
     button_draw()
 
   end
@@ -704,6 +731,18 @@ function love.draw()
     if love.keyboard.isDown('n') and hero.nameinput == "off" then
       hero.nameinput = "on"
     end
+  end
+
+  if gamestate == "pause" then
+    love.graphics.draw(pause,0,0)
+    button_draw()
+  end 
+
+  if gamestate == "leaderboard" then
+    love.graphics.draw(leaderboard,0,0)
+    love.graphics.newFont("fontes/fonteninja.ttf",40)
+    scoreslib.draw()
+    button_draw()
   end
 
   if gamestate == "menu" then
