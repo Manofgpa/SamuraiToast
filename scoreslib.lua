@@ -69,9 +69,9 @@ function h.loadHighscores(filename, n)
 end
 
 function h.draw()
-  love.graphics.print("Highscores:", 200, 100)
+  love.graphics.print("Highscores:", 200, 150)
   for i,v in ipairs(highscores) do
-    love.graphics.print("" .. v.name .. " - " .. v.score .. "", 200, 100 + i*30)
+    love.graphics.print("" .. v.name .. " - " .. v.score .. "", 200, 200 + i*30)
   end
 end
 
