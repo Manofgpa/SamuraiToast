@@ -393,8 +393,8 @@ function love.update(dt)
       if v.tipo == 1 then -- SE POWER 1 FOI PEGO 
         force = true 
       elseif v.tipo == 2 then  -- SE POWER 2 FOI PEGO AUMENTA A VIDA 
-        if hero.life < 400 then
-          hero.life = hero.life + 50
+        if hero.life < 380 then
+          hero.life = hero.life + 20
         end 
       else   -- SE POWER 3 FOI PEGO VARIAVEL VEL EH VERDADEIRA 
         run = timer
@@ -446,7 +446,7 @@ function power()
   else 
     img = love.graphics.newImage("hero/chicken.png") -- aumenta velocidade 
   end 
-  table.insert(powers , {img = img , tipo = tipo , pos_x = love.math.random(0,1000) , pos_y= love.math.random(0,1000), time=0} )
+  table.insert(powers , {img = img , tipo = tipo , pos_x = love.math.random(0,mundo.altura) , pos_y= love.math.random(0,mundo.largura), time=0} )
 end 
 
 love.keyboard.keysPressed = { }
