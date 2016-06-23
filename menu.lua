@@ -15,7 +15,7 @@ end
 function button_draw()
   for i,v in ipairs(button) do
     if v.mouseover == false then
-      love.graphics.setColor(255,255,255)
+      love.graphics.setColor(59,220,245)
     end
     if v.mouseover == true then
       love.graphics.setColor(love.math.random(255),love.math.random(255),love.math.random(255))
@@ -29,8 +29,6 @@ function button_draw()
     end
     love.graphics.setFont(fonte)
     love.graphics.print(v.text,v.x,v.y)
-
-
   end
 end
 
