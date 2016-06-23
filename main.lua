@@ -117,8 +117,9 @@ function love.update(dt)
 
   if gamestate == "pause" then
     button_clear()
-    button_spawn(50,200,"Resume","resume")
-    button_spawn(300,500,"Menu","menu")
+    button_spawn(50,500,"Resume","resume")
+    button_spawn(350,500,"Menu","menu")
+    button_spawn(650,500,"Quit","sair")
   end 
 
 
@@ -137,6 +138,7 @@ function love.update(dt)
   end
 
   if gamestate == "gameover" then
+    button_clear()
     gameReset()
     button_spawn(620,530,"Restart","restart")
     button_spawn(50,530,"Quit","sair")
@@ -273,8 +275,8 @@ function love.update(dt)
     end 
 
     for i,v in ipairs(enemy) do -- percorre tabela de inimigos checa cada um com o heroi 
-      if checkCol(hero.pos_x, hero.pos_y, hero.walk[hero.anim_frame]:getWidth()/2,hero.walk[hero.anim_frame]:getHeight()/2,
-        v.pos_x, v.pos_y, v.img[1]:getWidth()/2, v.img[1]:getHeight()/2) then -- checando hero com inimigos  
+      if checkCol(hero.pos_x - hero.walk[hero.anim_frame]:getWidth()/2, hero.pos_y - hero.walk[hero.anim_frame]:getHeight()/2, hero.walk[hero.anim_frame]:getWidth(),hero.walk[hero.anim_frame]:getHeight(),
+        v.pos_x - v.img[1]:getWidth()/2 , v.pos_y - v.img[1]:getHeight()/2 , v.img[1]:getWidth(), v.img[1]:getHeight()) then -- checando hero com inimigos  
         hero.life = hero.life -  (hero.damage*dt)
       end
     end 
@@ -617,12 +619,6 @@ end
 
 function love.draw()
 
-
-  if gamestate == "pause" then
-   
-    love.graphics.print("PAUSADO",100,110)
-  end
-
   if boss.on == true then 
     love.graphics.draw(--[[boss.walk[boss.frame]]boss1,boss.pos_y, boss.pos_x, 0, 1, 1 ,--[[boss.walk[boss.frame]]boss1:getWidth()/2, --[[boss.walk[boss.frame]]boss1:getHeight()/2)
   end 
@@ -648,7 +644,8 @@ function love.draw()
 
         love.graphics.setColor(255, 255, 255) 
         love.graphics.draw(hero.walk[hero.anim_frame], hero.pos_x ,  -- desenha heroi
-          hero.pos_y, 0, 0.85,0.85, hero.walk[hero.anim_frame]:getWidth()/2, hero.walk[hero.anim_frame]:getHeight()/2 )
+          hero.pos_y, 0,1,1, hero.walk[hero.anim_frame]:getWidth()/2, hero.walk[hero.anim_frame]:getHeight()/2 )
+        love.graphics.rectangle("line", hero.pos_x - hero.walk[hero.anim_frame]:getWidth()/2, hero.pos_y - hero.walk[hero.anim_frame]:getHeight()/2, hero.walk[hero.anim_frame]:getWidth(), hero.walk[hero.anim_frame]:getHeight())
 
         for i,v in ipairs(enemy) do
           love.graphics.draw( v.img[v.frame] , v.pos_x, v.pos_y)   -- draws enemies onscreen 
@@ -735,6 +732,7 @@ function love.draw()
 
   if gamestate == "pause" then
     love.graphics.draw(pause,0,0)
+    love.graphics.draw(pausado,250,100)
     button_draw()
   end 
 
