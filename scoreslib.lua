@@ -1,57 +1,78 @@
+local highscores = {}
 local h = {}
-h.scores = {}
+-- Salva as pontuações no arquivo
 
-function h.set(filename, places, name, score)
-	h.filename = filename
-	h.places = places
-	if not h.load() then
-		h.scores = {}
-		for i = 1, places do
-			h.scores[i] = {score, name}
-		end
-	end
+function h.saveHighscores(filename)
+  local file = io.open(filename, "w")
+  for i,v in ipairs(highscores) do
+    if i < #highscores then
+      file:write(v.name .. "-" .. v.score .. "\n")
+    else
+      file:write(v.name .. "-" .. v.score)
+    end
+  end
+	file:close()
 end
 
-function h.load()
-	local file = love.filesystem.newFile(h.filename)
-	if not love.filesystem.exists(h.filename) or not file:open("r") then return end
-	h.scores = {}
-	for line in file:lines() do
-		local i = line:find('\t', 1, true)
-		h.scores[#h.scores+1] = {tonumber(line:sub(1, i-1)), line:sub(i+1)}
-	end
-	return file:close()
+function sortScores(a, b)
+  return a.score > b.score
 end
 
-local function sortScore(a, b)
-	return a[1] > b[1]
-end
-function h.add(name, score)
-print(#h.scores)
-	h.scores[#h.scores+1] = {score, name}
-	table.sort(h.scores, sortScore)
-end
+-- Adiciona uma pontuação à tabela
+-- Retorna a tabela atualizada
 
-function h.save()
-	local file = love.filesystem.newFile(h.filename)
-	if not file:open("w") then return end
-	for i = 1, #h.scores do
-		item = h.scores[i]
-		file:write(item[1] .. "\t" .. item[2] .. "\n")
-	end
-	return file:close()
+function h.addHighscore(name, score)
+  table.insert(highscores, {name = name, score = score})
+  table.sort(highscores, sortScores)
+  table.remove(highscores, #highscores)
+  return highscores
 end
 
-setmetatable(h, {__call = function(self)
-	local i = 0
-	return function()
-		i = i + 1
-		if i <= h.places and h.scores[i] then
-			return i, unpack(h.scores[i])
-		end
-	end
-end})
+function split(str, pat)
+   local t = {}  -- NOTE: use {n = 0} in Lua-5.0
+   local fpat = "(.-)" .. pat
+   local last_end = 1
+   local s, e, cap = str:find(fpat, 1)
+   while s do
+      if s ~= 1 or cap ~= "" then
+        table.insert(t,cap)
+      end
+      last_end = e+1
+      s, e, cap = str:find(fpat, last_end)
+   end
+   if last_end <= #str then
+      cap = str:sub(last_end)
+      table.insert(t, cap)
+   end
+   return t
+end
 
-highscore = h
+-- Carrega as pontuações de um arquivo
+-- Retorna uma tabela com as maiores pontuações
+
+function h.loadHighscores(filename, n)
+  local file = io.open(filename, "r")
+  if file ~= nil then
+    for line in file:lines() do
+      local name, score = unpack(split(line, "-"))
+      print(name)
+      print(score)
+      table.insert(highscores, {name = tostring(name), score = tonumber(score)})
+    end
+    file:close()
+  else
+    for i=1, n do
+      table.insert(highscores, {name = " ", score = 0})
+    end
+  end
+  return highscores
+end
+
+function h.draw()
+  love.graphics.print("Highscores:", 200, 100)
+  for i,v in ipairs(highscores) do
+    love.graphics.print("" .. v.name .. " - " .. v.score .. "", 200, 100 + i*30)
+  end
+end
 
 return h
