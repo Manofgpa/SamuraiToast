@@ -32,7 +32,6 @@ end
 
 function love.load()
   pausado = love.graphics.newImage("menu/paused.png")
-  pause = love.graphics.newImage("menu/pause.jpg")
   leaderboard = love.graphics.newImage("menu/leaderboard.png")
   boss1 = love.graphics.newImage("enemies/boss1.png")
   boss2 = love.graphics.newImage("enemies/boss2.png")
@@ -731,7 +730,6 @@ function love.draw()
   end
 
   if gamestate == "pause" then
-    love.graphics.draw(pause,0,0)
     love.graphics.draw(pausado,250,100)
     button_draw()
   end 
