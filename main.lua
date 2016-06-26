@@ -129,6 +129,10 @@ function love.update(dt)
     button_draw()
   end
 
+  if love.keyboard.isDown("p") then
+	  gamestate = "pause"
+  end
+
   if love.keyboard.isDown("backspace") then
     local byteoffset = utf8.offset(hero.name, -1)
     if byteoffset then
@@ -652,7 +656,7 @@ function love.draw()
 
         local dir_y= 0  -- control shuriken aiming through hero frame
         local dir_x= 1 
-        while (love.keyboard.isDown("space")) and hero.shot <=0 do
+        while (love.keyboard.isDown("space") or love.keyboard.isDown(" ")) and hero.shot <=0 do
           if hero.anim_frame>=9 and hero.anim_frame <= 12 then -- Up 
             dir_y = -1 
             dir_x = 0 
